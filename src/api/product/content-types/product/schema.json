@@ -57,9 +57,9 @@
     "deletedBy": {
       "type": "string"
     },
-    "stock_adjustment": {
+    "stock_adjustments": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::stock-adjustment.stock-adjustment",
       "mappedBy": "product"
     }

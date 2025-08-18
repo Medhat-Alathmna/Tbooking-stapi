@@ -15,13 +15,7 @@
     "note": {
       "type": "string"
     },
-    "product": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product.product",
-      "inversedBy": "stock_adjustment"
-    },
-    "change_qty": {
+    "quantity": {
       "type": "integer"
     },
     "reason": {
@@ -32,6 +26,12 @@
     },
     "cost": {
       "type": "decimal"
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "inversedBy": "stock_adjustments"
     }
   }
 }
