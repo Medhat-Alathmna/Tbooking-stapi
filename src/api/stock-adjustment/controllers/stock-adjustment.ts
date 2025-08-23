@@ -141,9 +141,6 @@ async getProductMovements(ctx) {
         }
       });
     }
-    //
-    // 4️⃣ دمج وترتيب
-    //
     const movements = [
       ...adjustmentMovements,
       ...salesMovements,
