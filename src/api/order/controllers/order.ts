@@ -35,8 +35,17 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
       });
       let sum = 0;
       entities.forEach((entity) => {
-        sum += entity.cash + entity.appointment.deposit;
+        const cash = entity.cash || 0;
+        const deposit = entity.appointment?.deposit || 0;
+        sum += cash + deposit;
+
+  console.log({
+    cash,
+    deposit,
+
+  });
       });
+
 
       entities?.forEach((request) => {
         request.appointment.products?.forEach((product) => {
@@ -292,7 +301,7 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
         },
       });
       ctx.send({ entities });
-    } catch (error) {}
+    } catch (error) { }
   },
   async phoneNumbers(ctx) {
     const uniquePhones = {}; // This object will help track unique phone numbers
@@ -319,7 +328,7 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
         }
       });
       ctx.send({ phones });
-    } catch (error) {}
+    } catch (error) { }
   },
   async getLastNumberOrder(ctx) {
     const lastEntry = await strapi.db.query("api::order.order").findMany({
@@ -328,7 +337,7 @@ module.exports = createCoreController("api::order.order", ({ strapi }) => ({
     });
 
     if (lastEntry.length) {
-      const lastCreatedId = lastEntry[0]?.orderNo;      
+      const lastCreatedId = lastEntry[0]?.orderNo;
       let parts = lastCreatedId.split("-");
       let lastParts = parseInt(parts[parts.length - 1], 10) + 1;
       let incrementedLastPart = lastParts.toString().padStart(2, "0");
