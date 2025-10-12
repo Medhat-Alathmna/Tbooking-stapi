@@ -26,6 +26,7 @@
     "mysql": "2.18.1",
     "npm": "^6.0.0",
     "openai": "^5.8.2",
+    "pg": "^8.16.3",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
     "strapi-provider-email-extra": "^0.5.0"
