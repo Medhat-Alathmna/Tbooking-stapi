@@ -8,8 +8,21 @@ const axios = require('axios');
 import { JWT } from 'google-auth-library';
 // const { sanitizeEntity } = require('strapi-utils');
 import fs from 'fs';
-const serviceAccount = JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf-8'));
+let serviceAccount;
 
+try {
+  // First, try to parse it as JSON directly (for production/deployment)
+  serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+} catch (e) {
+  // If that fails, assume it's a file path (for local development)
+  const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (fs.existsSync(filePath)) {
+    serviceAccount = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  } else {
+    // If the file doesn't exist, throw a clearer error
+    throw new Error(`Could not find Google credentials file at path: ${filePath}. Please ensure the file exists or the environment variable contains the JSON content.`);
+  }
+}
 let eventSource;
 
 module.exports = createCoreController('api::appointment.appointment', ({ strapi }) => ({
