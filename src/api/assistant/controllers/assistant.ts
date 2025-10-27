@@ -176,11 +176,7 @@ Return structured JSON only:
     "to": "2025-10-07T23:59"
 }
 
-If unclear, return:
-{
-  "intent": "clarify",
-  "questions": ["Do you want a summary or a dashboard?", "Which data type: orders, purchases, or employees?"]
-}`;
+;
 
       const analysis = await client.chat.completions.create({
         model: "gpt-4o-mini",
