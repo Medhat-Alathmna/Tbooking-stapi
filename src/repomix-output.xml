@@ -1,0 +1,3793 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+admin/app.example.tsx
+admin/tsconfig.json
+admin/webpack.config.example.js
+api/appointment/content-types/appointment/lifecycles.ts
+api/appointment/content-types/appointment/schema.json
+api/appointment/controllers/appointment.ts
+api/appointment/routes/appointment.ts
+api/appointment/routes/search.ts
+api/appointment/services/appointment.ts
+api/assistant/controllers/assistant.ts
+api/assistant/routes/assistant.ts
+api/brand/content-types/brand/schema.json
+api/brand/controllers/brand.ts
+api/brand/routes/brand.ts
+api/brand/services/brand.ts
+api/currency/content-types/currency/schema.json
+api/currency/controllers/currency.ts
+api/currency/routes/currency.ts
+api/currency/services/currency.ts
+api/email/content-types/email/schema.json
+api/email/controllers/email.ts
+api/email/routes/email.ts
+api/email/services/email.ts
+api/export-excel/controllers/export-excel.ts
+api/export-excel/routes/export-excel.ts
+api/forbidden-number/content-types/forbidden-number/schema.json
+api/forbidden-number/controllers/forbidden-number.ts
+api/forbidden-number/routes/forbidden-number.ts
+api/forbidden-number/services/forbidden-number.ts
+api/general-setting/content-types/general-setting/schema.json
+api/general-setting/controllers/general-setting.ts
+api/general-setting/routes/general-setting.ts
+api/general-setting/services/general-setting.ts
+api/log/content-types/log/schema.json
+api/log/controllers/log.ts
+api/log/routes/log.ts
+api/log/services/log.ts
+api/main-settings-mobile/content-types/main-settings-mobile/schema.json
+api/main-settings-mobile/controllers/main-settings-mobile.ts
+api/main-settings-mobile/routes/main-settings-mobile.ts
+api/main-settings-mobile/services/main-settings-mobile.ts
+api/mobile-ad/content-types/mobile-ad/schema.json
+api/mobile-ad/controllers/mobile-ad.ts
+api/mobile-ad/controllers/publishedPosts.ts
+api/mobile-ad/routes/mobile-ad.ts
+api/mobile-ad/services/mobile-ad.ts
+api/mobile-notification/content-types/mobile-notification/schema.json
+api/mobile-notification/controllers/mobile-notification.ts
+api/mobile-notification/routes/mobile-notification.ts
+api/mobile-notification/services/mobile-notification.ts
+api/notification/content-types/notification/schema.json
+api/notification/controllers/notification.ts
+api/notification/routes/notification.ts
+api/notification/services/notification.ts
+api/order/content-types/order/schema.json
+api/order/controllers/order.ts
+api/order/routes/countPrice.ts
+api/order/routes/order.ts
+api/order/services/order.ts
+api/pay-by/content-types/pay-by/schema.json
+api/pay-by/controllers/pay-by.ts
+api/pay-by/routes/pay-by.ts
+api/pay-by/services/pay-by.ts
+api/privilege/content-types/privilege/schema.json
+api/privilege/controllers/privilege.ts
+api/privilege/routes/privilege.ts
+api/privilege/services/privilege.ts
+api/product/content-types/product/schema.json
+api/product/controllers/email.ts
+api/product/controllers/exp.ts
+api/product/controllers/product.ts
+api/product/controllers/qty.ts
+api/product/routes/expDate.ts
+api/product/routes/product.ts
+api/product/routes/qty.ts
+api/product/routes/updateProd.ts
+api/product/services/product.ts
+api/purchase-order/content-types/purchase-order/schema.json
+api/purchase-order/controllers/purchase-order.ts
+api/purchase-order/routes/po.ts
+api/purchase-order/routes/purchase-order.ts
+api/purchase-order/services/purchase-order.ts
+api/service/content-types/service/schema.json
+api/service/controllers/service.ts
+api/service/routes/service.ts
+api/service/services/service.ts
+api/site-info/content-types/site-info/schema.json
+api/site-info/controllers/site-info.ts
+api/site-info/routes/site-info.ts
+api/site-info/services/site-info.ts
+api/stock-adjustment/content-types/stock-adjustment/schema.json
+api/stock-adjustment/controllers/stock-adjustment.ts
+api/stock-adjustment/routes/stock-adjustment.ts
+api/stock-adjustment/services/stock-adjustment.ts
+api/supplier/content-types/supplier/schema.json
+api/supplier/controllers/supplier.ts
+api/supplier/routes/supplier.ts
+api/supplier/services/supplier.ts
+api/vendor-type/content-types/vendor-type/schema.json
+api/vendor-type/controllers/vendor-type.ts
+api/vendor-type/routes/vendor-type.ts
+api/vendor-type/services/vendor-type.ts
+api/vendor/content-types/vendor/schema.json
+api/vendor/controllers/vendor.ts
+api/vendor/routes/count.ts
+api/vendor/routes/vendor.ts
+api/vendor/services/vendor.ts
+extensions/users-permissions/content-types/user/schema.json
+index.ts
+types/strapi-io.d.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="admin/app.example.tsx">
+export default {
+  config: {
+    locales: [
+      // 'ar',
+      // 'fr',
+      // 'cs',
+      // 'de',
+      // 'dk',
+      // 'es',
+      // 'he',
+      // 'id',
+      // 'it',
+      // 'ja',
+      // 'ko',
+      // 'ms',
+      // 'nl',
+      // 'no',
+      // 'pl',
+      // 'pt-BR',
+      // 'pt',
+      // 'ru',
+      // 'sk',
+      // 'sv',
+      // 'th',
+      // 'tr',
+      // 'uk',
+      // 'vi',
+      // 'zh-Hans',
+      // 'zh',
+    ],
+  },
+  bootstrap(app) {
+    console.log(app);
+  },
+};
+</file>
+
+<file path="admin/tsconfig.json">
+{
+  "extends": "@strapi/typescript-utils/tsconfigs/admin",
+  "include": [
+    "../plugins/**/admin/src/**/*",
+    "./"
+  ],
+  "exclude": [
+    "node_modules/",
+    "build/",
+    "dist/",
+    "**/*.test.ts"
+  ]
+}
+</file>
+
+<file path="admin/webpack.config.example.js">
+'use strict';
+
+/* eslint-disable no-unused-vars */
+module.exports = (config, webpack) => {
+  // Note: we provide webpack above so you should not `require` it
+  // Perform customizations to webpack config
+  // Important: return the modified config
+  return config;
+};
+</file>
+
+<file path="api/appointment/content-types/appointment/lifecycles.ts">
+'use strict';
+
+module.exports = {
+  async afterCreate(event) {
+    const { result } = event;
+
+    // Only emit if created by mobile    
+    if (!result.createBy) {
+      if (strapi.io) {
+        strapi.io.emit('new-appointment', {
+          id: result.id,
+          name: result.name,
+          number: result.number,
+          phone: result.phone,
+          createdAt: result.createdAt,
+        });
+
+        strapi.log.info('📱 Emitted new-appointment (mobile)');
+      }
+    } else {
+      strapi.log.info('🖥️ Appointment created from web — no emit');
+    }
+  },
+};
+</file>
+
+<file path="api/appointment/content-types/appointment/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "appointments",
+  "info": {
+    "singularName": "appointment",
+    "pluralName": "appointments",
+    "displayName": "Appointment",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "number": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "customer": {
+      "type": "json",
+      "required": true
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "deposit": {
+      "type": "decimal"
+    },
+    "fromDate": {
+      "type": "datetime",
+      "required": false
+    },
+    "toDate": {
+      "type": "datetime"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "deletedBy": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Completed",
+        "Canceled",
+        "Draft"
+      ],
+      "default": "Draft",
+      "required": true
+    },
+    "products": {
+      "type": "json"
+    },
+    "employee": {
+      "type": "json"
+    },
+    "expoPushToken": {
+      "type": "string"
+    },
+    "bookBy": {
+      "type": "json"
+    },
+    "confirmBy": {
+      "type": "json"
+    },
+    "platform": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
+</file>
+
+<file path="api/appointment/controllers/appointment.ts">
+/**
+ * appointment controller
+ */
+'use strict';
+import { factories } from '@strapi/strapi'
+const { createCoreController } = require('@strapi/strapi').factories;
+const axios = require('axios');
+import { JWT } from 'google-auth-library';
+// const { sanitizeEntity } = require('strapi-utils');
+import fs from 'fs';
+let serviceAccount;
+
+try {
+  // First, try to parse it as JSON directly (for production/deployment)
+  serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+} catch (e) {
+  // If that fails, assume it's a file path (for local development)
+  const filePath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (fs.existsSync(filePath)) {
+    serviceAccount = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  } else {
+    // If the file doesn't exist, throw a clearer error
+    throw new Error(`Could not find Google credentials file at path: ${filePath}. Please ensure the file exists or the environment variable contains the JSON content.`);
+  }
+}
+let eventSource;
+
+module.exports = createCoreController('api::appointment.appointment', ({ strapi }) => ({
+    async searchCU(ctx) {
+        try {
+            const search = ctx.request.query;
+
+            const entities = await strapi.entityService.findMany('api::appointment.appointment', {
+                populate: '*',
+
+            },);
+            entities.map(x => {
+                x.customer.firstName = x.customer?.firstName?.toLocaleLowerCase()
+                x.customer.middleName = x.customer?.middleName?.toLocaleLowerCase()
+                x.customer.lastName = x.customer?.lastName?.toLocaleLowerCase()
+            });
+            let customer = entities.filter(x => x.customer?.firstName == search.search?.toLocaleLowerCase() || x.customer?.middleName == search.search?.toLocaleLowerCase() || x.customer?.lastName == search.search?.toLocaleLowerCase());
+
+            ctx.send({ customer });
+        } catch (error) {
+            ctx.throw(error)
+        }
+    },
+    async deleteUnapproved(ctx) {
+        try {
+            const entities = await strapi.entityService.findMany('api::appointment.appointment', {
+                populate: '*',
+                filters: {
+                    approved: { $eq: false },
+                }
+            },);
+            entities.forEach(ent => {
+                strapi.entityService.delete('api::appointment.appointment', ent.id)
+
+            })
+            ctx.send(entities)
+        } catch (error) {
+            ctx.throw(error)
+        }
+    },
+    async convertDraftToCancel(ctx) {
+        try {
+            const entities = await strapi.entityService.findMany('api::appointment.appointment', {
+                populate: '*',
+                filters: {
+                    approved: { $eq: true },
+                    status: { $eq: 'Draft' },
+                }
+            },);
+            entities.forEach(ent => {
+                strapi.entityService.update('api::appointment.appointment', ent.id,
+                    {
+                        data: {
+                            status: 'Canceled'
+                        }
+                    }
+                )
+
+            })
+            ctx.send(entities)
+        } catch (error) {
+            ctx.throw(error)
+        }
+    },
+    async searchOR(ctx) {
+        try {
+            const search = ctx.request.query;
+
+            const entities = await strapi.entityService.findMany('api::order.order', {
+                populate: '*',
+                pagination: {
+                         // Page number
+                    pageSize: 10 // Items per page
+                },
+            },);
+            // let customer
+            // entities.map(x=>{
+            //     customer  =x.appointment.find(x=>x.customer.firstName ==search.search|| x.customer.middleName ==search.search||x.customer.lastName==search.search);
+            // })
+            let customer = entities.filter(x => x.appointment?.customer?.firstName == search.search || x.appointment?.customer?.middleName == search.search || x.appointment?.customer?.lastName == search.search);
+            ctx.send({ customer });
+        } catch (error) {
+            ctx.throw(error)
+        }
+    },
+    
+    async booking(ctx) {
+        const { firstName, middleName, lastName, phone, expoPushToken, fromDate, toDate, address, approved,platform, employee, bookBy, confirmBy, deposit } = ctx.request.body;
+        const lastEntry = await strapi.db.query('api::appointment.appointment').findMany({
+            orderBy: { createdAt: 'desc' },
+            limit: 1,
+        });
+
+        // Extract the ID of the last created entry
+        if (lastEntry.length) {
+            const lastCreatedId = lastEntry[0]?.number;
+            let parts = lastCreatedId.split('-');
+            let lastParts = parseInt(parts[parts.length - 1], 10) + 1;
+            let incrementedLastPart = lastParts.toString().padStart(2, '0');
+            parts[parts.length - 1] = incrementedLastPart;
+            var incrementedNumberString = parts.join('-');
+        }else{
+            // If no entries exist, start with the first number
+            var incrementedNumberString:any = '01-01-23-00';
+        }
+        // Get today's date
+        const today = new Date();
+        const currentDay = today.getDate();
+        const currentMonth = today.getMonth() + 1; // Months are 0-indexed, so add 1
+        const currentYear = today.getFullYear().toString().slice(-2); // Get last two digits of the year
+    
+        // Split the previous date part
+        let [day, month, year, lastPart] = incrementedNumberString.split('-').map(Number);
+    
+        // Check if we need to reset to the next day
+        if (currentDay !== day || currentMonth !== month) {
+          // Reset increment to 0 and update the day and month
+          lastPart='00'
+          day = currentDay; // Update to today's day
+          month = currentMonth; // Update to today's month
+          year = currentYear; // Update to today's month
+        } else {
+          // Increment the last part for the same day
+          lastPart = (lastPart + 0).toString().padStart(2, '0');
+        }
+    
+            const newNumber = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year.toString().padStart(2, '0')}-${lastPart}`;
+        console.log('newNumber', newNumber);
+        
+        try {
+            const createAppo = await strapi.entityService.create('api::appointment.appointment', {
+                data: {
+
+                    employee: [employee],
+                    customer: {
+                        firstName,
+                        middleName,
+                        lastName
+                    },
+                    expoPushToken,
+                    phone, fromDate, address, bookBy,
+                    number: newNumber,confirmBy,
+                    toDate, approved, deposit,platform,
+                    hide: false,
+                }
+            });
+
+            // if (eventSource) {
+            //     const sanitizedEntity = sanitizeEntity(createAppo, { model: strapi.models['api::appointment.appointment'] });
+            //     eventSource.send(`data: ${JSON.stringify(sanitizedEntity)}\n\n`);
+            //   }
+              ctx.send({ message: 'Booking Created', createAppo });
+
+            //   return sanitizeEntity(createAppo, { model: strapi.models['api::appointment.appointment'] });
+        } catch (error) {
+            return ctx.throw(400, error);
+
+
+        }
+    },
+    async servicesMobile(ctx) {
+        try {
+            const entities = await strapi.entityService.findMany('api::service.service');
+            ctx.send(entities);
+        } catch (error) {
+            ctx.send({ message: error, error });
+
+        }
+    },
+    async usersMobile(ctx) {
+        try {
+            const entities = await strapi.entityService.findMany('plugin::users-permissions.user', {
+                populate: { someRelation: true },
+                filters: {
+                    blocked: { $eq: false },
+                    isToday: { $eq: true },
+                    hide: { $eq: false }
+                }
+            });
+            ctx.send(entities);
+        } catch (error) {
+            ctx.send({ message: error, error });
+
+        }
+    },
+    async publishedPosts(ctx) {
+        try {
+
+            const publishedPosts = await strapi.entityService.findMany('api::mobile-ad.mobile-ad', {
+                populate: 'ads',
+                filters: {
+                    published: { $eq: true },
+                },
+                sort: { createdAt: 'desc' },
+
+            });
+
+
+
+            ctx.send({ publishedPosts });
+        } catch (error) {
+            console.error(error);
+            return ctx.throw(500, 'Internal Server Error');
+        }
+    },
+    async notfi(ctx) {
+        ctx.set('Content-Type', 'text/event-stream');
+        ctx.set('Cache-Control', 'no-cache');
+        ctx.set('Connection', 'keep-alive');
+
+        // Send an initial event to the client
+        ctx.res.write(`data: Connection established\n\n`);
+
+        // Example: Send periodic updates every 5 seconds
+        const intervalId = setInterval(() => {
+            const message = { message: `Hello! Current time: ${new Date().toLocaleTimeString()}` };
+            ctx.res.write(`data: ${JSON.stringify(message)}\n\n`);
+        }, 5000);
+
+        // Stop sending events when the connection is closed
+        // ctx.req.on('close', () => {
+        //   clearInterval(intervalId);
+        //   ctx.res.end();
+        // });
+    },
+
+    async getLastNumber(ctx){
+        const lastEntry = await strapi.db.query('api::appointment.appointment').findMany({
+            orderBy: { createdAt: 'desc' },
+            limit: 1,
+        });
+ if (lastEntry.length) {
+        const lastCreatedId = lastEntry[0]?.number;
+        let parts = lastCreatedId.split('-');
+        let lastParts = parseInt(parts[parts.length - 1], 10) + 1;
+        let incrementedLastPart = lastParts.toString().padStart(2, '0');
+        parts[parts.length - 1] = incrementedLastPart;
+        var incrementedNumberString = parts.join('-');
+ }else{
+        // If no entries exist, start with the first number
+        var incrementedNumberString:any = '01-01-23-00';
+ }
+        // Get today's date
+        const today = new Date();
+        const currentDay = today.getDate();
+        const currentMonth = today.getMonth() + 1; // Months are 0-indexed, so add 1
+        const currentYear = today.getFullYear().toString().slice(-2); // Get last two digits of the year
+    
+        // Split the previous date part
+        let [day, month, year, lastPart] = incrementedNumberString.split('-').map(Number);
+    
+        // Check if we need to reset to the next day
+        if (currentDay !== day || currentMonth !== month) {
+          // Reset increment to 0 and update the day and month
+          lastPart='00'
+          day = currentDay; // Update to today's day
+          month = currentMonth; // Update to today's month
+          year = currentYear; // Update to today's month
+        } else {
+          // Increment the last part for the same day
+          lastPart = (lastPart + 0).toString().padStart(2, '0');
+        }
+    
+    
+        // Create the new date string
+        const newNumber = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year.toString().padStart(2, '0')}-${lastPart}`;
+        // Send the updated value as the response
+        ctx.send({ newNumber });
+      
+    },
+
+    async sse(ctx) {
+
+        ctx.set('Content-Type', 'text/event-stream');
+        ctx.set('Cache-Control', 'no-cache');
+        ctx.set('Connection', 'keep-alive');
+    
+        // Keep the connection open
+        eventSource = ctx;
+        eventSource.send(`data: ${JSON.stringify('test')}\n\n`);
+
+        // When the connection is closed, clean up
+        ctx.req.on('close', () => {
+          eventSource = null;
+        });
+                eventSource.send(`data: ${JSON.stringify('test')}\n\n`);
+
+      },
+      
+
+async sendPush(ctx) {
+  const { token, title, body } = ctx.request.body;
+
+  if (!token || !title || !body) {
+    ctx.throw(400, 'Missing token, title, or body');
+  }
+
+  const deviceToken = Array.isArray(token) ? token[0] : token;
+
+  try {
+    const client = new JWT({
+      email: serviceAccount.client_email,
+      key: serviceAccount.private_key,
+      scopes: ['https://www.googleapis.com/auth/firebase.messaging'],
+    });
+
+    await client.authorize();
+    const accessToken = (await client.getAccessToken()).token;
+
+    const url = `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`;
+
+    const message = {
+      message: {
+        token: deviceToken,
+        notification: {
+          title: title,
+          body: body,
+        },
+        android: {
+          notification: {
+            click_action: "OPEN_ACTIVITY_1",
+          },
+        },
+        apns: {
+          headers: {
+            "apns-priority": "10",
+          },
+          payload: {
+            aps: {
+              alert: {
+                title: title,
+                body: body,
+              },
+              sound: "default",
+              badge: 1,
+            },
+          },
+        },
+        webpush: {
+          headers: {
+            TTL: "86400",
+          },
+          notification: {
+            title: title,
+            body: body,
+          },
+        },
+      },
+    };
+
+    const response = await axios.post(url, message, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    ctx.send({ status: 'success', data: response.data });
+
+  } catch (error) {
+    ctx.send({
+      status: 'error',
+      message: 'Failed to send push notification',
+      details: error.response?.data || error.message,
+    });
+  }
+}
+}));
+</file>
+
+<file path="api/appointment/routes/appointment.ts">
+/**
+ * appointment router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::appointment.appointment');
+</file>
+
+<file path="api/appointment/routes/search.ts">
+module.exports = {
+  routes: [
+    { // Path defined with a URL parameter
+      method: 'POST',
+      path: '/booking',
+      handler: 'appointment.booking',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/searchCU',
+      handler: 'appointment.searchCU',
+      config: {
+        auth: false
+      }
+    },
+
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/searchOR',
+      handler: 'appointment.searchOR',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/servicesMobile',
+      handler: 'appointment.servicesMobile',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/usersMobile',
+      handler: 'appointment.usersMobile',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/publishedPosts',
+      handler: 'appointment.publishedPosts',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/getLastNumber',
+      handler: 'appointment.getLastNumber',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/convertDraftToCancel',
+      handler: 'appointment.convertDraftToCancel',
+      config: {
+        auth: false
+      }
+    },
+    { // Path defined with a URL parameter
+      method: 'GET',
+      path: '/deleteUnapproved',
+      handler: 'appointment.deleteUnapproved',
+      config: {
+        auth: false
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/sse",
+      "handler": "appointment.sse",
+      "config": {
+        auth: false,
+
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/notfi",
+      "handler": "appointment.notfi",
+      "config": {
+        auth: false,
+        "policies": []
+      }
+    },
+     {
+      method: 'POST',
+      path: '/sendPush',
+      handler: 'appointment.sendPush',
+      config: {
+        policies: [],
+        auth: false, // optional: turn on if needed
+      },
+    },
+
+
+  ]
+}
+</file>
+
+<file path="api/appointment/services/appointment.ts">
+/**
+ * appointment service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::appointment.appointment');
+</file>
+
+<file path="api/assistant/controllers/assistant.ts">
+const OpenAI = require("openai");
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+module.exports = {
+  async chat(ctx) {    
+    try {
+      const { message, type } = ctx.request.body;
+
+      // 🧩 تعريف أنواع البيانات المسموح بها
+      const entityMap = {
+        order: "api::order.order",
+        purchases: "api::purchase.purchase",
+        invoices: "api::invoice.invoice",
+        employees: "api::employee.employee",
+      };
+
+      // 🧭 1️⃣ أرسل الطلب الأول لتحليل نية المستخدم والفترة الزمنية
+      const analyzePrompt = `
+        أنت مساعد ذكي لنظام ERP.
+        حلل النص الذي سأرسله لتحديد:
+        - نوع البيانات (order, purchases, invoices, employees)
+        - هل يتضمن فترة زمنية (مثل اليوم، الأسبوع الماضي، الشهر الحالي...)
+        -اذا ذكر تواريخ مثلا اخر 3 ايام و لاتوحد بيانات في اخر 3 ايام ولكن في 2 يومين قم ايضا بجلب بيانات لليومين
+        - إذا نعم، احسب التواريخ بدقة بصيغة YYYY-MM-DD بناءً على التاريخ الحالي ${new Date().toISOString().split('T')[0]}.
+
+        أعد الرد في شكل JSON فقط بدون أي شرح، بالمثال التالي:
+        {
+          "entity": "order",
+          "needsDate": true,
+          "from": "2025-10-01",
+          "to": "2025-10-09"
+        }
+
+        إذا لم يذكر المستخدم أي فترة زمنية، اجعل:
+        {
+          "entity": "order",
+          "needsDate": false
+        }
+      `;
+
+      const analysis = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: analyzePrompt },
+          { role: "user", content: message },
+        ],
+        response_format: { type: "json_object" },
+      });
+
+      const parsed = JSON.parse(analysis.choices[0].message.content);
+      
+      // 🔎 تحديد الكيان
+      const entity = parsed.entity || type || "order";
+      const collection = entityMap[entity];
+      if (!collection) {
+        return ctx.send({ error: `النوع '${entity}' غير معروف.`, log: parsed }, 400);
+      }
+
+      // 🧩 2️⃣ جلب البيانات من Strapi
+      let filters:any = {};
+      if (parsed.needsDate && parsed.from && parsed.to) {
+        filters.createdAt = { $gte: parsed.from, $lte: parsed.to };
+      }
+
+      const data = await strapi.entityService.findMany(collection, { filters });
+
+      if (!data || data.length === 0) {
+        return ctx.send({
+          reply: `لم يتم العثور على بيانات (${entity}) في الفترة المطلوبة.`,
+        });
+      }
+
+      // 🧠 3️⃣ إرسال البيانات إلى GPT لتحليلها بالعربية
+      const summaryPrompt = `
+        أنت مساعد ذكاء اصطناعي متخصص في تحليل بيانات ERP.
+        أرسل لك بيانات ${entity} بصيغة JSON.
+        قم بتلخيصها للمستخدم  :
+        
+        اجعل الرد واضحًا ومهنيًا دون جداول.
+      `;
+
+      const completion = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: summaryPrompt },
+          { role: "user", content: JSON.stringify(data) },
+        ],
+      });
+
+      const reply = completion.choices[0].message.content;
+      ctx.send({ reply });
+    } catch (error) {
+      console.log(error);
+      
+      ctx.send({ error: "حدث خطأ أثناء تحليل البيانات.",log:error }, 500);
+    }
+  },
+};
+</file>
+
+<file path="api/assistant/routes/assistant.ts">
+module.exports = {
+  routes: [
+    {
+      method: "POST",
+      path: "/assistant",
+      handler: "assistant.chat",
+      config: { auth: false },
+    },
+  ],
+};
+</file>
+
+<file path="api/brand/content-types/brand/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "brands",
+  "info": {
+    "singularName": "brand",
+    "pluralName": "brands",
+    "displayName": "brand",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
+</file>
+
+<file path="api/brand/controllers/brand.ts">
+/**
+ * brand controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::brand.brand');
+</file>
+
+<file path="api/brand/routes/brand.ts">
+/**
+ * brand router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::brand.brand');
+</file>
+
+<file path="api/brand/services/brand.ts">
+/**
+ * brand service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::brand.brand');
+</file>
+
+<file path="api/currency/content-types/currency/schema.json">
+{
+  "kind": "singleType",
+  "collectionName": "currencies",
+  "info": {
+    "singularName": "currency",
+    "pluralName": "currencies",
+    "displayName": "currency",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "default": "USD"
+    },
+    "name": {
+      "type": "string",
+      "default": "Dollar"
+    }
+  }
+}
+</file>
+
+<file path="api/currency/controllers/currency.ts">
+/**
+ * currency controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::currency.currency');
+</file>
+
+<file path="api/currency/routes/currency.ts">
+/**
+ * currency router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::currency.currency');
+</file>
+
+<file path="api/currency/services/currency.ts">
+/**
+ * currency service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::currency.currency');
+</file>
+
+<file path="api/email/content-types/email/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "emails",
+  "info": {
+    "singularName": "email",
+    "pluralName": "emails",
+    "displayName": "Email",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text"
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}
+</file>
+
+<file path="api/email/controllers/email.ts">
+/**
+ * email controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::email.email');
+</file>
+
+<file path="api/email/routes/email.ts">
+/**
+ * email router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::email.email');
+</file>
+
+<file path="api/email/services/email.ts">
+/**
+ * email service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::email.email');
+</file>
+
+<file path="api/export-excel/controllers/export-excel.ts">
+'use strict';
+
+import dayjs from "dayjs";
+
+const ExcelJS = require('exceljs');
+const bcrypt = require('bcryptjs');
+function getValueFromPath(obj, path) {
+  // Handle custom virtual fields
+  if (path === 'appointment.customer.fullName') {
+    const c = obj?.appointment?.customer;
+    return c ? [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ') : '';
+  }
+  if (path === 'customer.fullName') {
+    const c = obj?.customer;
+    return c ? [c.firstName, c.middleName, c.lastName].filter(Boolean).join(' ') : '';
+  }
+  if (path === 'payments.list') {
+    const payments = obj?.payments;
+    if (!Array.isArray(payments)) return '';
+    return payments
+      .map(p => {
+        const name = p.by || 'Unknown';
+        const amount = p.pay ?? '0';
+        return `${name} (${amount})`;
+      })
+      .join(' + ');
+  }
+  if (path === 'fromDate.toDate') {
+    const fromDate = obj?.fromDate;
+    const toDate = obj?.toDate;
+    if (!fromDate || !toDate) return '';
+    return `${dayjs(fromDate).format('YYYY-MM-DD hh:mm')} --> ${dayjs(toDate).format('YYYY-MM-DD hh:mm')}`;
+
+  }
+  if (path === 'products.sell') {
+    const products = obj?.products;
+    if (!Array.isArray(products)) return '';
+    return products
+      .map(p => {
+        const name = p.name || 'Unknown';
+        const sellPrice = p.sellPrice ??'0';
+        return `${name} (${sellPrice})`;
+      })
+      .join(' + ');
+  }
+  if (path === 'products.qty') {
+    const products = obj?.products;
+    if (!Array.isArray(products)) return '';
+    return products
+      .map(p => {
+        const name = p.name || 'Unknown';
+        const qty = p.qty ??'0';
+        return `${name} (${qty})`;
+      })
+      .join(' + ');
+  }
+  if (path === 'products.list') {
+    const products = obj?.products;
+    if (!Array.isArray(products)) return '';
+    return products
+      .map(p => {
+        const name = p.name || 'Unknown';
+        const price = p.price ?? '0';
+        return `${name} (${price})`;
+      })
+      .join(' + ');
+  }
+  if (path === 'employees.services') {
+    const employees = obj?.employee;
+    if (!Array.isArray(employees)) return '';
+
+    return employees.map(emp => {
+      const name = emp.username || 'Unknown';
+      const services = emp.services?.map(s => `${s.en} (${s.price})`).join(', ') || '';
+      return `${name}: ${services}`;
+    }).join(' // ');
+  }
+  return path.split('.').reduce((o, k) => (o ? o[k] : ''), obj);
+}
+function extractPopulatePaths(columns) {
+  const populate = {};
+
+  columns.forEach(col => {
+    const path = col.key;
+    const parts = path.split('.');
+
+    if (parts.length > 1) {
+      let current = populate;
+
+      for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i];
+        current[part] = current[part] || {};
+        current[part].populate = current[part].populate || {};
+        current = current[part].populate;
+      }
+    }
+  });
+
+  return populate;
+}
+
+module.exports = {
+  async exportData(ctx) {
+    const { columns, collection, password } = ctx.request.body;
+
+    if (!columns || !Array.isArray(columns)) {
+      return ctx.badRequest('Missing columns');
+    }
+
+    if (!collection || typeof collection !== 'string') {
+      return ctx.badRequest('Missing or invalid collection');
+    }
+    if (!ctx.state.user) {
+      return ctx.unauthorized('You must be logged in');
+    }
+
+    if (!password) {
+      return ctx.badRequest('Password is required');
+    }
+    const uid = `api::${collection}.${collection}`;
+    const model = strapi.contentTypes[uid];
+
+    if (!model) {
+      return ctx.badRequest(`Collection '${collection}' not found.`);
+    }
+    const user = await strapi.entityService.findOne('plugin::users-permissions.user', ctx.state.user.id, {
+      fields: ['password']
+    });
+
+    // Compare entered password with hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return ctx.send({ message: 'Incorrect password' }, 401);
+    }
+    const populate = extractPopulatePaths(columns);
+
+    const data = await strapi.entityService.findMany(uid, {
+      populate,
+      filters: { hide: { $eq: false } },
+
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`${collection} Data`);
+
+    worksheet.columns = columns.map(col => ({
+      header: col.header,
+      key: col.key,
+      width: col.width || 20,
+    }));
+
+    data.forEach(item => {
+      const row = {};
+      columns.forEach(col => {
+        let value = getValueFromPath(item, col.key);
+
+        // Format date if requested
+        if (col.format && value) {
+          value = dayjs(value).format(col.format);
+        }
+
+        row[col.key] = value ?? '';
+      });
+
+      worksheet.addRow(row);
+    });
+
+    ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    ctx.set('Content-Disposition', 'attachment; filename=exported-data.xlsx');
+    ctx.body = await workbook.xlsx.writeBuffer();
+  },
+};
+</file>
+
+<file path="api/export-excel/routes/export-excel.ts">
+'use strict';
+
+module.exports = {
+  routes: [
+    {
+      method: 'POST',
+      path: '/export-excel',
+      handler: 'export-excel.exportData',
+     
+    },
+  ],
+};
+</file>
+
+<file path="api/forbidden-number/content-types/forbidden-number/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "forbidden_numbers",
+  "info": {
+    "singularName": "forbidden-number",
+    "pluralName": "forbidden-numbers",
+    "displayName": "forbidden Number",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "number": {
+      "type": "string",
+      "unique": true
+    },
+    "name": {
+      "type": "string"
+    }
+  }
+}
+</file>
+
+<file path="api/forbidden-number/controllers/forbidden-number.ts">
+/**
+ * forbidden-number controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::forbidden-number.forbidden-number');
+</file>
+
+<file path="api/forbidden-number/routes/forbidden-number.ts">
+/**
+ * forbidden-number router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::forbidden-number.forbidden-number');
+</file>
+
+<file path="api/forbidden-number/services/forbidden-number.ts">
+/**
+ * forbidden-number service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::forbidden-number.forbidden-number');
+</file>
+
+<file path="api/general-setting/content-types/general-setting/schema.json">
+{
+  "kind": "singleType",
+  "collectionName": "general_settings",
+  "info": {
+    "singularName": "general-setting",
+    "pluralName": "general-settings",
+    "displayName": "generalSetting",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "textColor": {
+      "type": "string",
+      "default": "#4e535a"
+    },
+    "primaryColor": {
+      "type": "string",
+      "default": "#4F7EEA"
+    },
+    "secondaryColor": {
+      "type": "string",
+      "default": "#797a7b"
+    }
+  }
+}
+</file>
+
+<file path="api/general-setting/controllers/general-setting.ts">
+/**
+ * general-setting controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::general-setting.general-setting');
+</file>
+
+<file path="api/general-setting/routes/general-setting.ts">
+/**
+ * general-setting router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::general-setting.general-setting');
+</file>
+
+<file path="api/general-setting/services/general-setting.ts">
+/**
+ * general-setting service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::general-setting.general-setting');
+</file>
+
+<file path="api/log/content-types/log/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "logs",
+  "info": {
+    "singularName": "log",
+    "pluralName": "logs",
+    "displayName": "log",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "log": {
+      "type": "string"
+    }
+  }
+}
+</file>
+
+<file path="api/log/controllers/log.ts">
+/**
+ * log controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::log.log');
+</file>
+
+<file path="api/log/routes/log.ts">
+/**
+ * log router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::log.log');
+</file>
+
+<file path="api/log/services/log.ts">
+/**
+ * log service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::log.log');
+</file>
+
+<file path="api/main-settings-mobile/content-types/main-settings-mobile/schema.json">
+{
+  "kind": "singleType",
+  "collectionName": "main_settings_mobiles",
+  "info": {
+    "singularName": "main-settings-mobile",
+    "pluralName": "main-settings-mobiles",
+    "displayName": "MainSettingsMobile"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "booking": {
+      "type": "boolean",
+      "default": true
+    },
+    "isDark": {
+      "type": "boolean",
+      "default": false
+    },
+    "phone": {
+      "type": "string"
+    }
+  }
+}
+</file>
+
+<file path="api/main-settings-mobile/controllers/main-settings-mobile.ts">
+/**
+ * main-settings-mobile controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::main-settings-mobile.main-settings-mobile');
+</file>
+
+<file path="api/main-settings-mobile/routes/main-settings-mobile.ts">
+/**
+ * main-settings-mobile router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::main-settings-mobile.main-settings-mobile');
+</file>
+
+<file path="api/main-settings-mobile/services/main-settings-mobile.ts">
+/**
+ * main-settings-mobile service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::main-settings-mobile.main-settings-mobile');
+</file>
+
+<file path="api/mobile-ad/content-types/mobile-ad/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "mobile_ads",
+  "info": {
+    "singularName": "mobile-ad",
+    "pluralName": "mobile-ads",
+    "displayName": "mobileAD",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ads": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "textEN": {
+      "type": "text"
+    },
+    "URL": {
+      "type": "string"
+    },
+    "published": {
+      "type": "boolean",
+      "default": false
+    },
+    "textAR": {
+      "type": "text"
+    },
+    "pin": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
+</file>
+
+<file path="api/mobile-ad/controllers/mobile-ad.ts">
+/**
+ * mobile-ad controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::mobile-ad.mobile-ad');
+</file>
+
+<file path="api/mobile-ad/controllers/publishedPosts.ts">
+import { createCoreController } from "@strapi/strapi/lib/factories";
+
+module.exports = createCoreController('api::mobile-ad.mobile-ad', ({ strapi }) => ({
+    async publishedPosts(ctx) {
+        try {
+            
+            const publishedPosts = await strapi.entityService.findMany('api::mobile-ad.mobile-ad', {
+                populate: '*',
+                filters: {
+                    published: { $eq: 'Draft' },
+                }
+            });
+
+
+
+            ctx.send({ publishedPosts });
+        } catch (error) {
+            console.error(error);
+            return ctx.throw(500, 'Internal Server Error');
+        }
+    },
+
+
+}));
+</file>
+
+<file path="api/mobile-ad/routes/mobile-ad.ts">
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::mobile-ad.mobile-ad');
+</file>
+
+<file path="api/mobile-ad/services/mobile-ad.ts">
+/**
+ * mobile-ad service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::mobile-ad.mobile-ad');
+</file>
+
+<file path="api/mobile-notification/content-types/mobile-notification/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "mobile_notifications",
+  "info": {
+    "singularName": "mobile-notification",
+    "pluralName": "mobile-notifications",
+    "displayName": "Mobile Notifications"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "string"
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
+</file>
+
+<file path="api/mobile-notification/controllers/mobile-notification.ts">
+/**
+ * mobile-notification controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::mobile-notification.mobile-notification');
+</file>
+
+<file path="api/mobile-notification/routes/mobile-notification.ts">
+/**
+ * mobile-notification router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::mobile-notification.mobile-notification');
+</file>
+
+<file path="api/mobile-notification/services/mobile-notification.ts">
+/**
+ * mobile-notification service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::mobile-notification.mobile-notification');
+</file>
+
+<file path="api/notification/content-types/notification/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "notifications",
+  "info": {
+    "singularName": "notification",
+    "pluralName": "notifications",
+    "displayName": "notification",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text",
+      "required": true
+    },
+    "main": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    }
+  }
+}
+</file>
+
+<file path="api/notification/controllers/notification.ts">
+/**
+ * notification controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::notification.notification');
+</file>
+
+<file path="api/notification/routes/notification.ts">
+/**
+ * notification router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::notification.notification');
+</file>
+
+<file path="api/notification/services/notification.ts">
+/**
+ * notification service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::notification.notification');
+</file>
+
+<file path="api/order/content-types/order/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "orderNo": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "appointment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::appointment.appointment"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Draft",
+        "Paid",
+        "Unpaid",
+        "Canceled"
+      ],
+      "default": "Draft",
+      "required": true
+    },
+    "cash": {
+      "type": "decimal"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "discount": {
+      "type": "decimal"
+    },
+    "discountType": {
+      "type": "enumeration",
+      "enum": [
+        "cash",
+        "percent"
+      ]
+    },
+    "pay_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::pay-by.pay-by"
+    },
+    "orderBy": {
+      "type": "json",
+      "required": true
+    }
+  }
+}
+</file>
+
+<file path="api/order/controllers/order.ts">
+"use strict";
+/**
+ * order controller
+ */
+
+import { factories } from "@strapi/strapi";
+
+const { createCoreController } = require("@strapi/strapi").factories;
+const { DateTime } = require("luxon");
+
+module.exports = createCoreController("api::order.order", ({ strapi }) => ({
+  async count(ctx) {
+    const productCounts: any = {};
+    const serviceCounts: any = {};
+
+    try {
+      const { startDate, endDate } = ctx.request.query;
+
+      const startDateTime = DateTime.fromISO(startDate)
+        .startOf("day")
+        .toJSDate();
+      const endDateTime = DateTime.fromISO(endDate).endOf("day").toJSDate();
+
+      const currentDate = DateTime.now().startOf("day").toJSDate();
+      const currentEndDate = DateTime.now().endOf("day").toJSDate();
+      const bodycurrentDate = [currentDate, currentEndDate];
+      const selectedtDate = [startDateTime, endDateTime];
+      const entities = await strapi.entityService.findMany("api::order.order", {
+        populate: "*",
+        filters: {
+          createdAt: { $between: startDate ? selectedtDate : bodycurrentDate },
+
+          status: { $ne: "Canceled" },
+        },
+      });
+      let sum = 0;
+      entities.forEach((entity) => {
+        const cash = entity.cash || 0;
+        const deposit = entity.appointment?.deposit || 0;
+        sum += cash + deposit;
+
+  console.log({
+    cash,
+    deposit,
+
+  });
+      });
+
+
+      entities?.forEach((request) => {
+        request.appointment.products?.forEach((product) => {
+          const productName = product.name;
+
+          // Step 2: Count Frequency or Sum Quantities
+          if (!productCounts[productName]) {
+            productCounts[productName] = {
+              qty: 0,
+              name: productName,
+              price: 0,
+            };
+          }
+          productCounts[productName].qty += product.qty;
+          productCounts[productName].price += product.qty * product.price;
+        });
+      });
+      const topProducts = Object.values(productCounts)
+        .sort((a: any, b: any) => b.qty - a.qty)
+        .slice(0, 5);
+
+      entities.forEach((request) => {
+        if (
+          request.appointment.employee &&
+          Array.isArray(request.appointment.employee)
+        ) {
+          request.appointment.employee.forEach((emp) => {
+            if (emp.services && Array.isArray(emp.services)) {
+              emp.services.forEach((service) => {
+                const serviceId = service.id;
+                if (!serviceCounts[serviceId]) {
+                  serviceCounts[serviceId] = {
+                    count: 0,
+                    ar: service.ar,
+                    en: service.en,
+                    price: service.price,
+                  };
+                }
+                serviceCounts[serviceId].count += 1;
+                serviceCounts[serviceId].price += service.price;
+              });
+            }
+          });
+        }
+      });
+      const topServices = Object.values(serviceCounts)
+        .sort((a: any, b: any) => b.count - a.count)
+        .slice(0, 5);
+      const canceld = await strapi.entityService.findMany("api::order.order", {
+        populate: { someRelation: true },
+        filters: {
+          status: { $eq: "Canceled" },
+          hide: { $eq: false },
+        },
+      });
+      let canceldLenght = canceld.length;
+
+      const paid = await strapi.entityService.findMany("api::order.order", {
+        populate: { someRelation: true },
+        filters: {
+          status: { $eq: "Paid" },
+          hide: { $eq: false },
+        },
+      });
+      let paidLenght = paid.length;
+
+      const unpaid = await strapi.entityService.findMany("api::order.order", {
+        populate: { someRelation: true },
+        filters: {
+          status: { $eq: "Unpaid" },
+          hide: { $eq: false },
+        },
+      });
+      let unpaidLenght = unpaid.length;
+
+      let po = await strapi.entityService.findMany(
+        "api::purchase-order.purchase-order",
+        {
+          populate: 'vendor',
+          filters: {
+            createdAt: {
+              $between: startDate ? selectedtDate : bodycurrentDate,
+            },
+            status: { $notIn: ["Canceled", "Draft"] },
+            hide: { $eq: false },
+          },
+        }
+      );
+      let poLength = po.length;
+      let cashPo = 0;
+      let costPo = 0;
+      po.forEach((x) => {
+        cashPo += x.cash;
+        x.products.forEach((element) => {
+          costPo += JSON.parse(element.sellPrice);
+        });
+      });
+      ctx.send({
+        entities,
+        sum,
+        canceldLenght,
+        paidLenght,
+        unpaidLenght,
+        topProducts,
+        topServices,
+        poLength,
+        cashPo,
+        costPo,
+        po
+      });
+    } catch (error) {
+      console.error(error);
+      return ctx.throw(500, "Internal Server Error");
+    }
+  },
+  async productInfo(ctx) {
+    const { startDate, endDate } = ctx.request.query;
+    const startDateTime = DateTime.fromISO(startDate).startOf("day").toJSDate();
+    const endDateTime = DateTime.fromISO(endDate).endOf("day").toJSDate();
+
+    const currentDate = DateTime.now().startOf("day").toJSDate();
+    const currentEndDate = DateTime.now().endOf("day").toJSDate();
+    const bodycurrentDate = [currentDate, currentEndDate];
+    const selectedtDate = [startDateTime, endDateTime];
+    let allproducts = [];
+    const entities = await strapi.entityService.findMany("api::order.order", {
+      populate: "*",
+      limit: -1,
+      filters: {
+        createdAt: { $between: startDate ? selectedtDate : bodycurrentDate },
+
+        status: { $ne: "Canceled" },
+      },
+    });
+    try {
+      const productId = ctx.params.id;
+
+      let totalQty = 0;
+      let totalRevenue = 0;
+
+      entities.forEach((request) => {
+        const products = request.products;
+        if (Array.isArray(products)) {
+          products.forEach((product) => {
+            if (product.id == parseInt(productId)) {
+              const qty = typeof product.qty === "number" ? product.qty : 0;
+              const price =
+                typeof product.price === "number" ? product.price : 0;
+              totalQty += qty;
+              totalRevenue += qty * price;
+              allproducts.push(request);
+            }
+          });
+        }
+      });
+      ctx.send({ totalQty, totalRevenue, allproducts });
+    } catch (error) {
+      ctx.throw(error);
+    }
+  },
+  //  async findMostActivePeriods(ctx) {
+  //     const events = [];
+  //     const { startDate, endDate } = ctx.request.query;
+
+  //     const startDateTime = DateTime.fromISO(startDate).startOf('day').toJSDate();
+  //     const endDateTime = DateTime.fromISO(endDate).endOf('day').toJSDate();
+
+  //     const currentDate = DateTime.now().startOf('day').toJSDate();
+  //     const currentEndDate = DateTime.now().endOf('day').toJSDate();
+  //     const bodycurrentDate = [currentDate, currentEndDate]
+  //     const selectedtDate = [startDateTime, endDateTime]
+  //     const entities = await strapi.entityService.findMany('api::order.order', {
+  //         populate: '*',
+  //         filters: {
+  //             createdAt: { $between: startDate ? selectedtDate : bodycurrentDate },
+
+  //             status: { $ne: 'Canceled' }
+  //         }
+  //     });
+  //     // Step 1: Create start and end events for each request
+  //     entities.forEach(request => {
+  //       const { fromDate, toDate } = request.appointment          ;
+
+  //       // Parse the dates
+  //       const start = new Date(fromDate);
+  //       const end = new Date(toDate);
+
+  //       // Push start and end events
+  //       events.push({ date: start, type: 'start' });
+  //       events.push({ date: end, type: 'end' });
+  //     });
+
+  //     // Step 2: Sort events
+  //     events.sort((a, b) => {
+  //       if (a.date < b.date) return -1;
+  //       if (a.date > b.date) return 1;
+  //       // If dates are equal, prioritize 'start' over 'end'
+  //       if (a.type === 'start' && b.type === 'end') return -1;
+  //       if (a.type === 'end' && b.type === 'start') return 1;
+  //       return 0;
+  //     });
+
+  //     // Step 3: Sweep through events to find maximum overlap
+  //     let currentActive = 0;
+  //     let maxActive = 0;
+  //     let periods = [];
+  //     let periodStart = null;
+
+  //     events.forEach(event => {
+  //       if (event.type === 'start') {
+  //         currentActive += 1;
+  //         if (currentActive > maxActive) {
+  //           // New maximum found, reset periods
+  //           maxActive = currentActive;
+  //           periods = [];
+  //           periodStart = event.date;
+  //         } else if (currentActive === maxActive) {
+  //           // Start of a new period with maxActive
+  //           periodStart = event.date;
+  //         }
+  //       } else if (event.type === 'end') {
+  //         if (currentActive === maxActive && periodStart) {
+  //           // End of a maxActive period
+  //           periods.push({ start: periodStart, end: event.date });
+  //           periodStart = null;
+  //         }
+  //         currentActive -= 1;
+  //       }
+  //     });
+
+  //     return {
+  //       maxActive,
+  //       periods: periods.map(p => ({
+  //         start: p.start.toISOString(),
+  //         end: p.end.toISOString(),
+  //         durationInDays: Math.ceil((p.end - p.start) / (1000 * 60 * 60 * 24))
+  //       }))
+  //     };
+  //   },
+  async searchs(ctx) {
+    try {
+      const search = ctx.request.query;
+
+      const entities = await strapi.entityService.findMany("api::order.order", {
+        populate: "*",
+        filters: {
+          "appointment.customer": {
+            $or: [
+              { firstName: { $containsi: search } },
+              { lastName: { $containsi: search } },
+            ],
+          },
+        },
+      });
+      ctx.send({ entities });
+    } catch (error) { }
+  },
+  async phoneNumbers(ctx) {
+    const uniquePhones = {}; // This object will help track unique phone numbers
+    const phones = [];
+    try {
+      const entities = await strapi.entityService.findMany("api::order.order", {
+        populate: "*",
+        filters: {
+          status: { $ne: "Canceled" },
+        },
+      });
+      entities.forEach((entity) => {
+        const customer =
+          entity.appointment.customer.firstName +
+          " " +
+          entity.appointment.customer.middleName +
+          " " +
+          entity.appointment.customer.lastName;
+        const phoneNumber = entity.appointment.phone;
+
+        if (!uniquePhones[phoneNumber] && phoneNumber) {
+          uniquePhones[phoneNumber] = true;
+          phones.push({ phone: phoneNumber, customer });
+        }
+      });
+      ctx.send({ phones });
+    } catch (error) { }
+  },
+  async getLastNumberOrder(ctx) {
+    const lastEntry = await strapi.db.query("api::order.order").findMany({
+      orderBy: { createdAt: "desc" },
+      limit: 1,
+    });
+
+    if (lastEntry.length) {
+      const lastCreatedId = lastEntry[0]?.orderNo;
+      let parts = lastCreatedId.split("-");
+      let lastParts = parseInt(parts[parts.length - 1], 10) + 1;
+      let incrementedLastPart = lastParts.toString().padStart(2, "0");
+      parts[parts.length - 1] = incrementedLastPart;
+      var incrementedNumberString = parts.join("-");
+    } else {
+      // If no entries exist, start with the first number
+      var incrementedNumberString: any = "01-01-23-00";
+    }
+    // Get today's date
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth() + 1; // Months are 0-indexed, so add 1
+    const currentYear = today.getFullYear().toString().slice(-2); // Get last two digits of the year
+
+    // Split the previous date part
+    let [day, month, year, lastPart] = incrementedNumberString
+      .split("-")
+      .map(Number);
+
+    // Check if we need to reset to the next day
+    if (currentDay !== day || currentMonth !== month) {
+      // Reset increment to 0 and update the day and month
+      lastPart = "00";
+      day = currentDay; // Update to today's day
+      month = currentMonth; // Update to today's month
+      year = currentYear; // Update to today's month
+    } else {
+      // Increment the last part for the same day
+      lastPart = (lastPart + 0).toString().padStart(2, "0");
+    }
+
+    // Create the new date string
+    const newNumber = `${day.toString().padStart(2, "0")}-${month
+      .toString()
+      .padStart(2, "0")}-${year.toString().padStart(2, "0")}-${lastPart}`;
+    // Send the updated value as the response
+    ctx.send({ newNumber });
+  },
+}));
+</file>
+
+<file path="api/order/routes/countPrice.ts">
+module.exports = {
+    routes: [
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/count',
+            handler: 'order.count',
+            config:{
+              auth:  false
+            }
+        },
+       
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/numbers',
+            handler: 'order.phoneNumbers',
+            config:{
+              auth:  false
+            }
+        },
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/searchCustomer',
+            handler: 'order.searchs',
+            config:{
+              auth:  false
+            }
+        },
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/productInfo/:id',
+            handler: 'order.productInfo',
+            config:{
+              auth:  false
+            }
+        },
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/getLastNumberOrder',
+            handler: 'order.getLastNumberOrder',
+            config:{
+              auth:  false
+            }
+        },
+        
+    ]
+}
+</file>
+
+<file path="api/order/routes/order.ts">
+/**
+ * order router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::order.order');
+</file>
+
+<file path="api/order/services/order.ts">
+/**
+ * order service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::order.order');
+</file>
+
+<file path="api/pay-by/content-types/pay-by/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "pay_bies",
+  "info": {
+    "singularName": "pay-by",
+    "pluralName": "pay-bies",
+    "displayName": "payBy"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
+</file>
+
+<file path="api/pay-by/controllers/pay-by.ts">
+/**
+ * pay-by controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::pay-by.pay-by');
+</file>
+
+<file path="api/pay-by/routes/pay-by.ts">
+/**
+ * pay-by router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::pay-by.pay-by');
+</file>
+
+<file path="api/pay-by/services/pay-by.ts">
+/**
+ * pay-by service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::pay-by.pay-by');
+</file>
+
+<file path="api/privilege/content-types/privilege/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "privileges",
+  "info": {
+    "singularName": "privilege",
+    "pluralName": "privileges",
+    "displayName": "privileges",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "role": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "pages": {
+      "type": "json",
+      "required": true
+    },
+    "users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "privilege"
+    }
+  }
+}
+</file>
+
+<file path="api/privilege/controllers/privilege.ts">
+/**
+ * privilege controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::privilege.privilege');
+</file>
+
+<file path="api/privilege/routes/privilege.ts">
+/**
+ * privilege router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::privilege.privilege');
+</file>
+
+<file path="api/privilege/services/privilege.ts">
+/**
+ * privilege service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::privilege.privilege');
+</file>
+
+<file path="api/product/content-types/product/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "product",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "stocks": {
+      "type": "integer",
+      "min": 0
+    },
+    "sellPrice": {
+      "type": "decimal",
+      "min": 0
+    },
+    "barcode": {
+      "type": "string",
+      "unique": true
+    },
+    "notes": {
+      "type": "text"
+    },
+    "brand": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::brand.brand"
+    },
+    "lastUpdated": {
+      "type": "string"
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    },
+    "suppliers": {
+      "type": "json"
+    },
+    "details": {
+      "type": "json"
+    },
+    "category": {
+      "type": "json"
+    },
+    "deletedBy": {
+      "type": "string"
+    },
+    "stock_adjustments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::stock-adjustment.stock-adjustment",
+      "mappedBy": "product"
+    }
+  }
+}
+</file>
+
+<file path="api/product/controllers/email.ts">
+module.exports={
+    
+    async sendEmail(ctx) {
+        const {to,from,replyTo,subject,text} = ctx.request.body;
+        try {
+      const email=await strapi.plugins['email'].services.email.send({
+            to,
+            from,
+            replyTo,
+            subject,
+            text,
+          })
+          ctx.send(email)
+        } catch (error) {
+            ctx.send(error)
+        }
+    }
+}
+</file>
+
+<file path="api/product/controllers/exp.ts">
+module.exports = {
+    async filterProducts(ctx) {
+
+      try {
+        const currentDate = new Date();
+        const threeMonthsFromNow = new Date(currentDate);
+        threeMonthsFromNow.setMonth(currentDate.getMonth() + 3);
+
+      let products = await strapi.entityService.findMany('api::product.product', {
+        populate: "*",
+        filters: {
+            dateExpire: { $eq: threeMonthsFromNow.toISOString().split('T')[0]},
+           
+        }
+      });
+      
+  
+        ctx.send(products);
+      } catch (err) {
+        ctx.send(err);
+      }
+    },
+  };
+</file>
+
+<file path="api/product/controllers/product.ts">
+'use strict';
+/**
+ * product controller
+ */
+import { factories } from '@strapi/strapi'
+const { createCoreController } = require('@strapi/strapi').factories;
+
+module.exports = createCoreController('api::product.product', ({ strapi }) => ({
+
+    // async  applayCatProducts(ctx) {
+    //     const selectedCat = ctx.request.body;
+    //     try {
+    //         const entities = await strapi.entityService.findMany('api::product.product', {
+    //             populate: '*',
+               
+    //         },);
+            
+    //       entities.map(async element => {
+
+    //         // console.log(element);
+    //         // console.log(element.category=[]);
+    //         console.log(element.category=[{...selectedCat}]);
+
+    //         // let fin=element.category.push(selectedCat) 
+    //         //  strapi.entityService.update('api::product.product',element.id,{
+    //         //     data:{
+    //         //         category:[]
+    //         //     }
+    //         // })
+    //       });
+    //       console.log(selectedCat);
+
+    //         ctx.send({ selectedCat});
+    //     } catch (error) {
+    //         ctx.throw(error)
+    //     }
+    // },
+    async applayCatProducts(ctx) {
+        const selectedCat = ctx.request.body; // The category object to apply to all products
+        try {
+        // Fetch all products with the `category` field populated
+       // Fetch all products with the `category` field populated
+       const products = await strapi.entityService.findMany('api::product.product', {
+        populate: ['category'],
+      });
+
+      for (const product of products) {
+        // Ensure `category` is initialized as an array
+        let currentCategories = product.category || []; // Initialize as an empty array if null or undefined
+
+        // Check if `category` is an array
+        if (!Array.isArray(currentCategories)) {
+          currentCategories = [currentCategories]; // Convert to array if it's a single object
+        }
+
+        // Check for duplicates before pushing the new category
+        const isDuplicate = currentCategories.some(
+          (existingCat) => existingCat.category === selectedCat.category
+        );
+
+        if (!isDuplicate) {
+          // Add the new category to the existing categories
+          currentCategories.push(selectedCat);
+        }
+
+        // Update the product in the database
+        await strapi.entityService.update('api::product.product', product.id, {
+          data: {
+            category: currentCategories,
+          },
+        });
+      }
+          ctx.send({ message: 'Categories applied to all products successfully!', selectedCat });
+        } catch (error) {
+          console.error('Error updating categories:', error);
+          ctx.throw(500, 'Failed to apply categories to products');
+        }
+      }
+      
+
+}));
+</file>
+
+<file path="api/product/controllers/qty.ts">
+module.exports = {
+    async updateStock(ctx) {
+      const productId = ctx.params.id;
+      const { qty } = ctx.request.body;
+      let product = await strapi.entityService.findOne('api::product.product',productId, {
+        
+        populate: "*",
+      });
+      try {
+          
+        // Update stock quantity
+        product.stocks -= qty;
+        
+        // Save updated product
+        const updatedProduct = await strapi.entityService.update('api::product.product', productId, {
+            data:{
+                stocks:product.stocks
+            }
+        });
+  
+        ctx.send({ message: 'Stock updated successfully', updatedProduct });
+      } catch (err) {
+        ctx.send(product);
+      }
+    },
+  };
+</file>
+
+<file path="api/product/routes/expDate.ts">
+module.exports = {
+    routes: [
+        {
+            method: 'GET',
+            path: '/filterProducts',
+            handler: 'exp.filterProducts',
+            config:{
+              auth:  false,
+              "policies": []
+            }
+        },
+        
+    ]
+}
+</file>
+
+<file path="api/product/routes/product.ts">
+/**
+ * product router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::product.product');
+</file>
+
+<file path="api/product/routes/qty.ts">
+module.exports = {
+    routes: [
+        {
+            method: 'PUT',
+            path: '/discountQTY/:id',
+            handler: 'qty.updateStock',
+            config:{
+              auth:  false,
+              "policies": []
+            }
+        },
+        { // Path defined with a URL parameter
+            method: 'POST',
+            path: '/applayCatProducts',
+            handler: 'product.applayCatProducts',
+            config:{
+              auth:  false
+            }
+        },
+        
+    ]
+}
+</file>
+
+<file path="api/product/routes/updateProd.ts">
+module.exports = {
+    routes: [
+
+        {
+            method: 'POST',
+            path: '/sendEmail',
+            handler: 'email.sendEmail',
+            config:{
+              auth:  false
+            }
+        },
+      
+        
+    ]
+}
+module.exports = {
+    routes: [
+
+        {
+            method: 'POST',
+            path: '/sendEmail',
+            handler: 'email.sendEmail',
+            config:{
+              auth:  false
+            }
+        },
+        
+    ]
+}
+</file>
+
+<file path="api/product/services/product.ts">
+/**
+ * product service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::product.product');
+</file>
+
+<file path="api/purchase-order/content-types/purchase-order/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "purchase_orders",
+  "info": {
+    "singularName": "purchase-order",
+    "pluralName": "purchase-orders",
+    "displayName": "purchaseOrder",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "no": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "Draft",
+        "Paid",
+        "Unpaid",
+        "Canceled"
+      ],
+      "default": "Draft"
+    },
+    "cash": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "vendor": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::vendor.vendor",
+      "inversedBy": "purchase_orders"
+    },
+    "products": {
+      "type": "json",
+      "required": true
+    },
+    "payments": {
+      "type": "json"
+    },
+    "createBy": {
+      "type": "json",
+      "required": true
+    },
+    "addedToStuck": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "pic": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    },
+    "cancellationNote": {
+      "type": "string"
+    },
+    "canceledAt": {
+      "type": "datetime"
+    },
+    "canceledBy": {
+      "type": "json"
+    }
+  }
+}
+</file>
+
+<file path="api/purchase-order/controllers/purchase-order.ts">
+/**
+ * purchase-order controller
+ */
+'use strict';
+import { factories } from '@strapi/strapi'
+const { DateTime } = require('luxon');
+
+const { createCoreController } = require('@strapi/strapi').factories;
+module.exports = createCoreController('api::purchase-order.purchase-order', ({ strapi }) => ({
+
+  async createPO(ctx) {
+    const { vendor, cash, status, payments, products, createBy, addedToStuck,pic } = ctx.request.body;
+    const lastEntry = await strapi.db.query('api::purchase-order.purchase-order').findMany({
+      orderBy: { createdAt: 'desc' },
+      limit: 1,
+    });
+    if (lastEntry.length) {
+      const lastCreatedId = lastEntry[0]?.no;
+      let parts = lastCreatedId?.split('-');
+      let lastParts = parseInt(parts[parts.length - 1], 10) + 1;
+      let incrementedLastPart = lastParts.toString().padStart(2, '0');
+      parts[parts.length - 1] = incrementedLastPart;
+      var incrementedNumberString = parts.join('-');
+    } else {
+      // If no entries exist, start with the first number
+      var incrementedNumberString: any = '01-01-23-00';
+    }
+
+    // Get today's date
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth() + 1; // Months are 0-indexed, so add 1
+    const currentYear = today.getFullYear().toString().slice(-2); // Get last two digits of the year
+
+    // Split the previous date part
+    let [day, month, year, lastPart] = incrementedNumberString.split('-').map(Number);
+
+    // Check if we need to reset to the next day
+    if (currentDay !== day || currentMonth !== month) {
+      // Reset increment to 0 and update the day and month
+      lastPart = '00'
+      day = currentDay; // Update to today's day
+      month = currentMonth; // Update to today's month
+      year = currentYear; // Update to today's month
+    } else {
+      // Increment the last part for the same day
+      lastPart = (lastPart + 0).toString().padStart(2, '0');
+    }
+
+    const newNumber = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year.toString().padStart(2, '0')}-${lastPart}`;
+
+    try {
+      const createPO = await strapi.entityService.create('api::purchase-order.purchase-order', {
+        data: {
+          no: newNumber,
+          vendor,
+          cash,
+          status,
+          payments,
+          products,
+          createBy,
+          addedToStuck,
+          pic,
+          hide:false
+        }
+      });
+
+
+      ctx.send({ message: 'PO Created', createPO });
+
+    } catch (error) {
+      return ctx.throw(400, error);
+
+
+    }
+  },
+  async updateStock(ctx) {
+    const { products } = ctx.request.body;
+    try {
+      for (let index = 0; index < products.length; index++) {
+        let product = await strapi.entityService.findOne('api::product.product', products[index].id,);
+        // Update stock quantity
+        product.stocks += products[index].qty;
+        // Save updated product
+        var updatedProduct = await strapi.entityService.update('api::product.product', products[index].id, {
+          data: {
+            stocks: product.stocks
+          }
+        });
+      }
+      ctx.send({ message: 'Stock updated successfully', updatedProduct });
+    } catch (err) {
+      ctx.send(err);
+    }
+  },
+  async count(ctx) {
+        const productCounts: any = {};
+
+    const { startDate, endDate } = ctx.request.query;
+    const vendor = ctx.params.id
+
+    const startDateTime = DateTime.fromISO(startDate).startOf('day').toJSDate();
+    const endDateTime = DateTime.fromISO(endDate).endOf('day').toJSDate();
+
+    const currentDate = DateTime.now().startOf('day').toJSDate();
+    const currentEndDate = DateTime.now().endOf('day').toJSDate();
+    const bodycurrentDate = [currentDate, currentEndDate]
+    const selectedtDate = [startDateTime, endDateTime]
+    const entities = await strapi.entityService.findMany('api::purchase-order.purchase-order', {
+      populate: '*',
+      auth: false,
+      filters: {
+        createdAt: { $between: startDate ? selectedtDate : bodycurrentDate },
+        status: { $notIn: ['Canceled','Draft'] },
+        vendor: { id: vendor },
+      }
+
+    });
+    try {
+      let cash = 0
+      let cost=0
+      let count = entities.length ? entities.length : 0
+      entities?.forEach((request) => {
+        request.products?.forEach((product) => {
+          const productName = product.name;
+
+          if (!productCounts[productName]) {
+            productCounts[productName] = {
+              qty: 0,
+              name: productName,
+              sellPrice: 0,
+            };
+          }
+          productCounts[productName].qty += product.qty;
+          productCounts[productName].sellPrice += product.sellPrice * product.sellPrice;
+        });
+      });
+      const topProducts = Object.values(productCounts)
+        .sort((a: any, b: any) => b.qty - a.qty)
+        .slice(0, 5);
+      const costestPorducts = Object.values(productCounts)
+        .sort((a: any, b: any) => b.sellPrice - a.sellPrice)
+        .slice(0, 5);
+      entities.forEach(x => {
+        cash += x.cash
+        x.products.forEach(element => {
+          cost+=JSON.parse(element.sellPrice)*element.qty
+        });
+      })
+
+
+      ctx.send({ entities, topProducts, count, cash ,cost,costestPorducts})
+    } catch (error) {
+
+    }
+  }
+}));
+</file>
+
+<file path="api/purchase-order/routes/po.ts">
+module.exports = {
+    routes: [
+        { // Path defined with a URL parameter
+            method: 'POST',
+            path: '/po',
+            handler: 'purchase-order.createPO',
+            
+        },
+        { // Path defined with a URL parameter
+            method: 'POST',
+            path: '/addStuck',
+            handler: 'purchase-order.updateStock',
+            
+        },
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/statics/:id',
+            handler: 'purchase-order.count',
+            
+        },
+    ]
+}
+</file>
+
+<file path="api/purchase-order/routes/purchase-order.ts">
+/**
+ * purchase-order router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::purchase-order.purchase-order');
+</file>
+
+<file path="api/purchase-order/services/purchase-order.ts">
+/**
+ * purchase-order service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::purchase-order.purchase-order');
+</file>
+
+<file path="api/service/content-types/service/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "services",
+  "info": {
+    "singularName": "service",
+    "pluralName": "services",
+    "displayName": "Service",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "en": {
+      "type": "string",
+      "required": true
+    },
+    "ar": {
+      "type": "string",
+      "required": true
+    },
+    "deletedBy": {
+      "type": "string"
+    },
+    "price": {
+      "type": "decimal",
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
+</file>
+
+<file path="api/service/controllers/service.ts">
+/**
+ * service controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::service.service');
+</file>
+
+<file path="api/service/routes/service.ts">
+/**
+ * service router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::service.service');
+</file>
+
+<file path="api/service/services/service.ts">
+/**
+ * service service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::service.service');
+</file>
+
+<file path="api/site-info/content-types/site-info/schema.json">
+{
+  "kind": "singleType",
+  "collectionName": "site_infos",
+  "info": {
+    "singularName": "site-info",
+    "pluralName": "site-infos",
+    "displayName": "orderPic",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "default": "Tbooking"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "footer": {
+      "type": "string",
+      "default": "Thank you for your business!"
+    }
+  }
+}
+</file>
+
+<file path="api/site-info/controllers/site-info.ts">
+/**
+ * site-info controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::site-info.site-info');
+</file>
+
+<file path="api/site-info/routes/site-info.ts">
+/**
+ * site-info router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::site-info.site-info');
+</file>
+
+<file path="api/site-info/services/site-info.ts">
+/**
+ * site-info service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::site-info.site-info');
+</file>
+
+<file path="api/stock-adjustment/content-types/stock-adjustment/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "stock_adjustments",
+  "info": {
+    "singularName": "stock-adjustment",
+    "pluralName": "stock-adjustments",
+    "displayName": "StockAdjustments",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "note": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "user": {
+      "type": "json"
+    },
+    "cost": {
+      "type": "decimal"
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product",
+      "inversedBy": "stock_adjustments"
+    }
+  }
+}
+</file>
+
+<file path="api/stock-adjustment/controllers/stock-adjustment.ts">
+/**
+ * stock-adjustment controller
+ */
+
+import { factories } from '@strapi/strapi'
+const { createCoreController } = require('@strapi/strapi').factories;
+export default factories.createCoreController('api::stock-adjustment.stock-adjustment');
+
+module.exports = createCoreController('api::stock-adjustment.stock-adjustment', ({ strapi }) => ({
+
+  async createStockAdjustmentAndUpdateStock(ctx) {
+  const { product, quantity, reason, note, cost, user } = ctx.request.body;
+
+  const knex = strapi.db.connection; // DB connection from Strapi
+
+  try {
+    await knex.transaction(async (trx) => {
+      const existingProduct = await strapi.db.query('api::product.product').findOne({
+        where: { id: product },
+        select: ['id', 'stocks'],
+        transacting: trx
+      });
+
+      if (!existingProduct) {
+        throw new Error("Product not found");
+      }
+
+      const newStock = existingProduct.stocks + quantity;
+      if (newStock < 0) {
+        throw new Error("Stock can't be negative");
+      }
+
+      const createStockAdjustment = await strapi.db.query('api::stock-adjustment.stock-adjustment').create({
+        data: { product, quantity, reason, note, cost, user },
+        transacting: trx
+      });
+
+      const updatedProduct = await strapi.db.query('api::product.product').update({
+        where: { id: product },
+        data: { stocks: newStock },
+        transacting: trx
+      });
+
+      ctx.send({
+        adjustment: createStockAdjustment,
+        product: updatedProduct
+      });
+    });
+  } catch (error) {
+    return ctx.throw(400, error.message);
+  }
+},
+
+
+async getProductMovements(ctx) {
+  try {
+    const { productId } = ctx.params;
+
+ 
+    const adjustments = await strapi.db.query('api::stock-adjustment.stock-adjustment').findMany({
+      where: { product: productId },
+      populate: { user: true, product: true }
+    });
+
+    const adjustmentMovements = adjustments.map(a => ({
+      type: 'adjustment',
+      id: a.id,
+      productId: a.product?.id,
+      productName: a.product?.name,
+      quantity: a.quantity,
+      price: null,
+      vendor: null,
+      customer: null,
+      reason: a.reason,
+      note: a.note,
+      cost: a.cost,
+      user: a.user?.username,
+      date: a.createdAt
+    }));
+
+    //
+    // 2️⃣ المبيعات (Orders → Appointment → Products)
+    //
+    const orders = await strapi.db.query('api::order.order').findMany({
+      populate: {
+        appointment: { populate: { products: true, customer: true } }
+      }
+    });
+
+    const salesMovements = [];
+    for (const order of orders) {
+      order.appointment?.products?.forEach(p => {
+        if (p.id === Number(productId)) {
+          salesMovements.push({
+            type: 'sales',
+            id: order.id,
+            productId: p.id,
+            productName: p.name,
+            quantity: -p.qty,
+            price: p.price,
+            vendor: null,
+            customer: order.appointment?.customer
+              ? `${order.appointment.customer.firstName} ${order.appointment.customer.middleName ?? ''} ${order.appointment.customer.lastName}`
+              : null,
+            reason: null,
+            note: order?.notes,
+            cost: null,
+            user: order?.orderBy,
+            date: order?.createdAt
+          });
+        }
+      });
+    }
+
+    //
+    // 3️⃣ المشتريات (PO → Products)
+    //
+    const purchaseOrders = await strapi.db.query('api::purchase-order.purchase-order').findMany({
+      populate: { products: true, vendor: true, createBy: true }
+    });
+
+    const purchaseMovements = [];
+    for (const po of purchaseOrders) {
+      po.products?.forEach(p => {
+        if (p.id === Number(productId)) {
+          purchaseMovements.push({
+            type: 'purchases',
+            id: po.id,
+            productId: p.id,
+            productName: p.name,
+            quantity: p.qty,
+            price: p.sellPrice,
+            vendor: po.vendor?.name,
+            customer: null,
+            reason: null,
+            note: null,
+            cost: null,
+            user: po.createBy?.username,
+            date: po?.createdAt
+          });
+        }
+      });
+    }
+    const movements = [
+      ...adjustmentMovements,
+      ...salesMovements,
+      ...purchaseMovements
+    ];
+
+movements.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    ctx.send(movements);
+
+  } catch (error) {
+    return ctx.throw(400, error.message);
+  }
+}
+
+
+}));
+</file>
+
+<file path="api/stock-adjustment/routes/stock-adjustment.ts">
+/**
+ * stock-adjustment router
+ */
+
+// import { factories } from '@strapi/strapi';
+
+// export default factories.createCoreRouter('api::stock-adjustment.stock-adjustment');
+module.exports = {
+    routes: [
+        { // Path defined with a URL parameter
+            method: 'POST',
+            path: '/stock-adjustments',
+            handler: 'stock-adjustment.createStockAdjustmentAndUpdateStock',
+            "config": {
+                auth: false,
+            }
+        },
+        { // Path defined with a URL parameter
+            method: 'GET',
+            path: '/productLogs/:productId',
+            handler: 'stock-adjustment.getProductMovements',
+            "config": {
+                auth: false,
+            }
+        },
+    ]
+}
+</file>
+
+<file path="api/stock-adjustment/services/stock-adjustment.ts">
+/**
+ * stock-adjustment service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::stock-adjustment.stock-adjustment');
+</file>
+
+<file path="api/supplier/content-types/supplier/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "suppliers",
+  "info": {
+    "singularName": "supplier",
+    "pluralName": "suppliers",
+    "displayName": "supplier"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string"
+    },
+    "companies": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::vendor.vendor",
+      "inversedBy": "suppliers"
+    }
+  }
+}
+</file>
+
+<file path="api/supplier/controllers/supplier.ts">
+/**
+ * supplier controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::supplier.supplier');
+</file>
+
+<file path="api/supplier/routes/supplier.ts">
+/**
+ * supplier router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::supplier.supplier');
+</file>
+
+<file path="api/supplier/services/supplier.ts">
+/**
+ * supplier service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::supplier.supplier');
+</file>
+
+<file path="api/vendor-type/content-types/vendor-type/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "vendor_types",
+  "info": {
+    "singularName": "vendor-type",
+    "pluralName": "vendor-types",
+    "displayName": "vendorType"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    }
+  }
+}
+</file>
+
+<file path="api/vendor-type/controllers/vendor-type.ts">
+/**
+ * vendor-type controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::vendor-type.vendor-type');
+</file>
+
+<file path="api/vendor-type/routes/vendor-type.ts">
+/**
+ * vendor-type router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::vendor-type.vendor-type');
+</file>
+
+<file path="api/vendor-type/services/vendor-type.ts">
+/**
+ * vendor-type service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::vendor-type.vendor-type');
+</file>
+
+<file path="api/vendor/content-types/vendor/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "vendors",
+  "info": {
+    "singularName": "vendor",
+    "pluralName": "vendors",
+    "displayName": "company",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "json"
+    },
+    "purchase_orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::purchase-order.purchase-order",
+      "mappedBy": "vendor"
+    },
+    "company": {
+      "type": "string",
+      "required": true
+    },
+    "companyPhone": {
+      "type": "string"
+    },
+    "isCompanyShow": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    },
+    "vendor_type": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::vendor-type.vendor-type"
+    },
+    "deletedBy": {
+      "type": "string"
+    },
+    "suppliers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::supplier.supplier",
+      "mappedBy": "companies"
+    }
+  }
+}
+</file>
+
+<file path="api/vendor/controllers/vendor.ts">
+/**
+ * vendor controller
+ */
+
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::vendor.vendor');
+</file>
+
+<file path="api/vendor/routes/count.ts">
+module.exports = {
+    routes: [
+    //    { 
+    //         method: 'GET',
+    //         path: '/statics/:id',
+    //         handler: 'vendor.count',
+            
+            
+    //     },
+    ]
+}
+</file>
+
+<file path="api/vendor/routes/vendor.ts">
+/**
+ * vendor router
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreRouter('api::vendor.vendor');
+</file>
+
+<file path="api/vendor/services/vendor.ts">
+/**
+ * vendor service
+ */
+
+import { factories } from '@strapi/strapi';
+
+export default factories.createCoreService('api::vendor.vendor');
+</file>
+
+<file path="extensions/users-permissions/content-types/user/schema.json">
+{
+  "kind": "collectionType",
+  "collectionName": "up_users",
+  "info": {
+    "name": "user",
+    "description": "",
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "User"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "unique": true,
+      "configurable": false,
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "minLength": 6,
+      "configurable": false,
+      "required": true
+    },
+    "provider": {
+      "type": "string",
+      "configurable": false
+    },
+    "password": {
+      "type": "password",
+      "minLength": 6,
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "resetPasswordToken": {
+      "type": "string",
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "confirmationToken": {
+      "type": "string",
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "blocked": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "role": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.role",
+      "inversedBy": "users",
+      "configurable": false
+    },
+    "phone": {
+      "type": "string"
+    },
+    "deletedBy": {
+      "type": "string"
+    },
+    "hide": {
+      "type": "boolean",
+      "default": false
+    },
+    "privilege": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::privilege.privilege",
+      "inversedBy": "users"
+    },
+    "isToday": {
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "gender": {
+      "type": "enumeration",
+      "enum": [
+        "Male",
+        "Female"
+      ],
+      "default": "Male",
+      "required": true
+    },
+    "expoPushToken": {
+      "type": "string"
+    }
+  }
+}
+</file>
+
+<file path="index.ts">
+const socketIO = require('socket.io');
+
+module.exports = {
+  register(/*{ strapi }*/) {},
+
+  bootstrap({ strapi }) {
+    const io = socketIO(strapi.server.httpServer, {
+      cors: {
+        origin: '*', // Adjust this to your web admin domain in production
+        methods: ['GET', 'POST'],
+      },
+    });
+
+    strapi.io = io; // Make io accessible in lifecycles
+
+    io.on('connection', (socket) => {
+      console.log('Web admin connected to socket:', socket.id);
+    });
+  },
+};
+</file>
+
+<file path="types/strapi-io.d.ts">
+import type { Server as IOServer } from 'socket.io';
+
+declare module '@strapi/strapi' {
+  interface Strapi {
+    io?: IOServer;
+  }
+}
+</file>
+
+</files>
