@@ -61,65 +61,59 @@ function getCollectionSchemaInfo(collectionName) {
  * Custom business meanings for fields per collection
  */
 function getCustomFieldMeaning(collectionName) {
-  const customMeanings = {
+ const customMeanings = {
     order: {
-      id: { description: "Unique ID of the order" },
-      createdAt: {
-        description: "Date when the order was created (used for time filters).",
-      },
-      total: {
-        description: "Total value of the order (including taxes & discounts).",
-      },
-      cash: { description: "Amount received from customer." },
-      deposit: {
-        description: "Deposit amount received before full payment.",
-      },
+      id: { description: "Unique internal order ID.(Do not display it)" },
+      orderNo: { description: "This is Unique order Number (Display field)" },
+      customer: { description: "Customer who placed the order. Use  (firstName + middleName + lastName ). for labels. from appointment schema" },
+      appointment: { description: "Linked appointment record (if any). Connects order to schedule data." },
+      cash: { description: "Amount paid by customer and it's called payment (use in revenue dashboards)." },
+      total: { description: "Total order value  (used for comparisons with cash)." },
       status: {
-        description: "Order payment status and state of completion.",
+        description: "Order payment status.",
         values: {
-          paid: "fully paid — customer has paid the total amount.",
-          unpaid:
-            "partially paid — some money was received but not full amount.",
-          canceled: "invoice canceled — exclude from financial summaries.",
+          paid: "Fully paid.",
+          unpaid: "Partially paid.",
+          canceled: "Canceled — exclude from analytics.",
         },
       },
-      payment_method: {
-        description: "Payment method (cash, card, bank transfer, etc.)",
+      employee: { description: "Employee who handled the order." },
+      createdAt: { description: "Order creation date." },
+    },
+
+    appointment: {
+      id: { description: "Unique appointment ID." },
+      customer: { description: "Client who booked the appointment (firstName + middleName + lastName for labels)." },
+      employee: { description: "Assigned employee (employee.name for performance dashboards)." },
+      fromDate: { description: "Appointment start date and time." },
+      toDate: { description: "Appointment end date and time." },
+      cash: { description: "Service price booked in the appointment." },
+      approved: { description: "Indicates if the appointment is approved." },
+      deposit: { description: "Deposit amount paid at booking." },
+      paid: { description: "Amount paid (deposit or full payment)." },
+      employees: { description: "List of employees involved in the appointment, also has a services JSON booked in at appointment, may be multi employees and their have own services every each." },
+      products: { description: "Products booked in the appointment." },
+      status: {
+        description: "Appointment status.",
+        values: {
+          Draft: "Appointment drafted.",
+          Completed: "Appointment completed. that's mean converted to order.",
+          Canceled: "Appointment canceled (ignore).",
+        },
       },
-      employee: {
-        description: "Employee who created or processed the order.",
-      },
-      branch: { description: "Branch where the order was created." },
+      order: { description: "Related order created after appointment completion (appointment.order)." },
     },
 
     "purchase-order": {
-      id: { description: "Unique ID of the purchase order." },
-      createdAt: {
-        description: "Date when the purchase order was created (for date filters).",
-      },
-      vendor: { description: "Supplier/vendor related to this purchase order." },
-      total: {
-        description: "Total value of the purchase (including taxes and fees).",
-      },
-      paid: { description: "Amount paid to the vendor for this purchase order." },
-      balance: { description: "Remaining unpaid amount." },
-      status: {
-        description: "Payment or processing status of the purchase order.",
-        values: {
-          paid: "fully paid — vendor fully compensated.",
-          unpaid: "partially paid — some amount still due.",
-          pending: "waiting for confirmation or payment — not finalized yet.",
-          canceled: "purchase canceled — ignore from total sums or analytics.",
-        },
-      },
-      payment_method: {
-        description: "How the vendor was paid (cash, bank, transfer, etc.).",
-      },
-      note: { description: "Additional info or remarks about the purchase." },
+      id: { description: "Purchase order ID." },
+      vendor: { description: "Supplier/vendor (vendor.name for labels)." },
+      paid: { description: "Amount paid to vendor." },
+      total: { description: "Total purchase value." },
+      status: { description: "Purchase order status." },
+      createdAt: { description: "Date of purchase order creation." },
     },
-  };
-
-  return customMeanings[collectionName] || {};
+}
+return customMeanings[collectionName] || {};
 }
 
 /* ------------------------------------------------------------------
@@ -128,193 +122,216 @@ function getCustomFieldMeaning(collectionName) {
 
 module.exports = {
   
-  async chat(ctx) {
-    try {
-      const { message, type } = ctx.request.body;
+async chat(ctx) {
+  try {
+    const { message, type } = ctx.request.body;
+    const today = new Date().toISOString().split("T")[0];
+    const entity = (type || "order").toLowerCase();
+const isArabic = /[\u0600-\u06FF]/.test(message);
+const lang = isArabic ? "Arabic" : "English";
+    // 🧩 معلومات الحقول والعلاقات
+    const schemaInfo = getCustomFieldMeaning(entity);
+    const relations = {
+      order: ["appointment", "customer", "employee"],
+      appointment: ["order", "customer", "employee"],
+      "purchase-order": ["vendor"],
+    };
 
-      const entityMap = {
-        order: "api::order.order",
-        "purchase-order": "api::purchase-order.purchase-order",
-        invoice: "api::invoice.invoice",
-        employee: "api::employee.employee",
-      };
+    const entityMap = {
+      order: "api::order.order",
+      "purchase-order": "api::purchase-order.purchase-order",
+      appointment: "api::appointment.appointment",
+      invoice: "api::invoice.invoice",
+      employee: "api::employee.employee",
+    };
 
-      // 🧠 1️⃣ تحليل نية المستخدم
-      const analyzePrompt = `
+    // 🧠 1️⃣ تحليل النية والفترة الزمنية
+    const analyzePrompt = `
+You are an advanced ERP AI Assistant.
+Today’s date: ${today}.
+User language: ${lang}.
 
-You are an ERP AI assistant analyzing a user's request.
-Today's date is ${today}.
-All time references (today, this week, this month) should be resolved based on this date.
-If the user says "today", use from = to = current date.
-If the user says "this week", compute start and end of current week based on current date.
-If the user says "this month", compute first and last day of current month.
- Time Formatting Rules:
-- Always include both date and time in ISO format.
-- Start of day must be "T00:00".
-- End of day must be "T23:59".
-- Example:
-  {
-    "from": "2025-10-01T00:00",
-    "to": "2025-10-07T23:59"
-  }
+Context:
+- You assist in analyzing, summarizing, and visualizing ERP data.
+- Below are field meanings and relationships for the selected entity.
+
+Fields:
+${JSON.stringify(schemaInfo, null, 2)}
+
+Relations:
+${JSON.stringify(relations[entity] || [], null, 2)}
+
 Your goals:
-1. Detect the user's intent:
-   - "summary" → wants a text summary of data.
-   - "dashboard" → wants a visual dashboard (charts, stats, tables).
-   - "clarify" → unclear message, return guiding questions.
-2. Identify the entity mentioned (orders, purchases, invoices, employees).
-3. Identify the time range if mentioned (today, this week, this month, etc.).
-4. If user mentions chart types like "line", "bar", "double bar", "pie", detect it as dashboardType.
+1. Detect the user's intent: "summary", "dashboard", or "clarify".
+2. Detect any time range (today, last month, this week, etc.) and return ISO dates:
+   {"from": "YYYY-MM-DDT00:00", "to": "YYYY-MM-DDT23:59"}
+3. Suggest dashboard type (bar, line, pie, double-bar) if user asks for visual data.
+4. Exclude canceled or invalid records automatically.
+5. If no intent is clear, default to "summary".
+6. Return ONLY JSON using this exact format:
 
-Return structured JSON only:
 {
-  "intent": "dashboard",
-  "entity": "order",
-  "dashboardType": "bar",
-  "needsDate": true,
- "from": "2025-10-01T00:00",
-    "to": "2025-10-07T23:59"
+  "intent": "summary" | "dashboard" | "clarify",
+  "title": "string",
+  "entity": "${entity}",
+  "period": {"from": "YYYY-MM-DDTHH:mm", "to": "YYYY-MM-DDTHH:mm"},
+  "dashboardType": "bar" | "line" | "pie" | null,
+  "filters": {},
+  "summary": {"text": "string"},
+  "suggestions": []
 }
-
-;
-
-      const analysis = await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: analyzePrompt },
-          { role: "user", content: message },
-        ],
-        response_format: { type: "json_object" },
-      });
-
-      const parsed = JSON.parse(analysis.choices[0].message.content);
-      console.log("🧩 [ANALYSIS RESULT]", parsed);
-
-      if (parsed.intent === "clarify") {
-        return ctx.send({
-          type: "clarify",
-          questions: parsed.questions || ["Can you clarify your request?"],
-        });
-      }
-
-      const entity = type 
-      const collection = entityMap[entity];
-      if (!collection)
-        return ctx.send({
-          error: `Unknown entity '${entity}'.`,
-          log: parsed,
-        });
-
-      // 🗃️ 2️⃣ جلب البيانات من Strapi
-      let filters = parsed.filters || {};
-      if (parsed.needsDate && parsed.from && parsed.to) {
-        filters.createdAt = { $gte: parsed.from, $lte: parsed.to };
-      }
-
-      const data = await strapi.entityService.findMany(collection, { filters });
-      console.log("📊 [DATA FETCHED]", data?.length || 0);
-
-      // 🔎 3️⃣ تحديد نوع الإخراج
-      if (!data || data.length === 0) {
-        return ctx.send({
-          reply: `No ${entity} data found for the specified period.`,
-        });
-      }
-
-      // 🧾 حالة الملخص النصي
-      if (parsed.intent === "summary") {
-        const summaryPrompt = `
-You are an ERP assistant summarizing structured data.
-Summarize the JSON data clearly and concisely, in the user's language.
-
-Rules:
-- Reply in a professional, human tone (max 2–3 lines).
-- If Arabic detected, respond in Arabic.
-- Do not output raw JSON.
-
-Examples:
-Arabic: "تم العثور على 8 طلبات مدفوعة هذا الشهر بإجمالي 3500 دولار."
-English: "Found 8 paid orders this month totaling $3500."
 `;
 
-        const completion = await client.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: summaryPrompt },
-            { role: "user", content: JSON.stringify(data) },
+    const analysis = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: analyzePrompt },
+        { role: "user", content: message },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const parsed = JSON.parse(analysis.choices[0].message.content || "{}");
+    console.log("🧩 [ANALYSIS RESULT]", parsed);
+
+    // 🟡 Clarify step
+    if (parsed.intent === "clarify") {
+      return ctx.send({
+        type: "clarify",
+        title: parsed.title || "توضيح مطلوب",
+        entity,
+        summary: parsed.summary || { text: "هل يمكنك توضيح المطلوب أكثر؟" },
+        suggestions:
+          parsed.suggestions || [
+            "هل ترغب بعرض ملخص أم لوحة بيانية؟",
+            "هل تريد بيانات هذا الشهر أم السابقة؟",
           ],
-        });
+      });
+    }
 
-        const reply = completion.choices[0].message.content;
-        return ctx.send({ type: "text", reply });
-      }
+    // 🧭 2️⃣ جلب البيانات من Strapi
+    const collection = entityMap[entity];
+    if (!collection)
+      return ctx.send({
+        type: "clarify",
+        summary: { text: `⚠️ الكيان '${entity}' غير معروف.` },
+        suggestions: Object.keys(entityMap),
+      });
 
-      // 📊 حالة إنشاء داشبورد
-      if (parsed.intent === "dashboard") {
-        const dashboardPrompt = `
-You are an ERP dashboard generator.
+    const filters = parsed.filters || {};
+    if (parsed.period?.from && parsed.period?.to) {
+      filters.createdAt = {
+        $gte: parsed.period.from,
+        $lte: parsed.period.to,
+      };
+    }
 
-Input: JSON data from Strapi for the entity ${entity}.
-The user requested a ${parsed.dashboardType || "bar"} dashboard visualization.
+    const data = await strapi.entityService.findMany(collection, {
+      filters,
+      populate: '*',
+    });
 
-Generate only valid JSON:
+    console.log(`📊 [${entity}] Records fetched: ${data?.length || 0}`);
+
+    if (!data?.length) {
+      return ctx.send({
+        type: "summary",
+        entity,
+        summary: {
+          text: `لم يتم العثور على أي بيانات لـ ${entity} في الفترة المحددة.`,
+        },
+        suggestions: [
+          "هل ترغب بتوسيع النطاق الزمني؟",
+          "هل تريد عرض بيانات الشهر الماضي؟",
+        ],
+      });
+    }
+
+    // 🧠 3️⃣ إرسال البيانات الفعلية إلى GPT للتحليل النهائي
+    const dataPrompt = `
+You are a data analyst for an ERP system.
+The user said: "${message}".
+Below is real JSON data from the "${entity}" collection.
+User language: ${lang}.
+do not translate field names or values, keep them as is.
+Analyze the numeric fields (total, cash, discount).
+Your tasks:
+- If intent = "summary": write a clear ${lang} summary (max 3 lines).
+- If intent = "dashboard":
+   - Use human-readable labels (${schemaInfo}).
+   - Create one or more widgets: charts or stats.
+   - Each widget must have clear and realistic data points.
+
+   - Avoid repeating the same widget structure as before — always recalculate.
+   - Return valid JSON only.
+   - summarize data's widgets(label,value) in a field called "widgetsSummary/ how you get this data from any data in fields subSummary" , try to mention their orderNo .
+   
+
+Output format (always use this exact structure):
 {
-  "type": "dashboard",
+  "type": "dashboard" | "summary",
+  "title": "string",
+  "entity": "${entity}",
+  "period": ${JSON.stringify(parsed.period || {})},
   "dashboardType": "${parsed.dashboardType || "bar"}",
-  "title": "Dashboard for ${entity}",
-  "period": { "from": "${parsed.from}", "to": "${parsed.to}" },
   "widgets": [
     {
       "type": "chart",
-      "chartType": "${parsed.dashboardType || "bar"}",
-      "label": "Daily Orders",
-      "data": [
-        { "date": "2025-10-01", "orders": 4 },
-        { "date": "2025-10-02", "orders": 8 }
-      ]
+      "chartType": "bar" | "line" | "pie",
+      "label": "string",
+      "data": [{"label": "string", "value": number}],
+      "unit": "string",
+      "widgetsSummary": "string",
+      "subSummary": "any"
     },
     {
       "type": "stat",
-      "label": "Total Revenue",
-      "value": 12500,
-      "unit": "USD"
+      "label": "string",
+      "data": [{"label": "count", "value": number}],
+      "unit": "string"
     }
-  ]
+  ],
+  "summary": {"text": "string"},
+  "suggestions": ["string", "string"]
 }
 
-Respond with JSON only, no explanation.
 `;
 
-        const dashboardResponse = await client.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: dashboardPrompt },
-            { role: "user", content: JSON.stringify(data) },
-          ],
-          response_format: { type: "json_object" },
-        });
+    const fullAnalysis = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: dataPrompt },
+        { role: "user", content: JSON.stringify(data) },
+      ],
+    });
 
-        const dashboardJson = JSON.parse(
-          dashboardResponse.choices[0].message.content
-        );
+    const aiOutput = fullAnalysis.choices[0].message.content.trim();
+    console.log("🧠 [GPT FINAL OUTPUT]", aiOutput);
 
-        return ctx.send(dashboardJson);
-      }
-
-      // 🟡 احتياط: إذا لم يفهم النية
+    let finalJSON;
+    try {
+      finalJSON = JSON.parse(aiOutput);
+    } catch (err) {
+      console.error("⚠️ JSON Parse Error:", err.message);
       return ctx.send({
-        reply: "I couldn’t determine what you need. Try specifying 'summary' or 'dashboard'.",
-        debug: parsed,
+        type: "summary",
+        entity,
+        summary: { text: "تم تحليل البيانات، لكن الرد لم يكن بتنسيق JSON صالح." },
       });
-    } catch (error) {
-      console.error("❌ [Assistant Error]", error);
-      ctx.send(
-        {
-          error: "Error analyzing or generating response.",
-          details: error.message,
-        },
-        500
-      );
     }
-  },
+
+    // ✅ إرسال النتيجة النهائية
+    ctx.send(finalJSON);
+  } catch (error) {
+    console.error("❌ [Assistant Error]", error);
+    ctx.send(
+      {
+        error: "حدث خطأ أثناء تحليل البيانات.",
+        details: error.message,
+      },
+      500
+    );
+  }
+}
+
 };
