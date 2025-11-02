@@ -135,7 +135,7 @@ module.exports = {
     }
     const populate = extractPopulatePaths(columns);
 
-    const data = await strapi.entityService.findMany(uid, {
+    const data = await strapi.entityService.findMany(model, {
       populate,
       filters: { hide: { $eq: false } },
 

@@ -1,13 +1,12 @@
-import { createCoreController } from "@strapi/strapi/lib/factories";
 
-module.exports = createCoreController('api::mobile-ad.mobile-ad', ({ strapi }) => ({
+module.exports = ({
     async publishedPosts(ctx) {
         try {
             
             const publishedPosts = await strapi.entityService.findMany('api::mobile-ad.mobile-ad', {
                 populate: '*',
                 filters: {
-                    published: { $eq: 'Draft' },
+                    published: { $eq: 'true' },
                 }
             });
 
@@ -21,6 +20,6 @@ module.exports = createCoreController('api::mobile-ad.mobile-ad', ({ strapi }) =
     },
 
 
-}));
+})
 
 

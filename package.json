@@ -11,14 +11,21 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/plugin-content-manager": "^4.25.8",
-    "@strapi/plugin-i18n": "4.12.0",
-    "@strapi/plugin-users-permissions": "4.12.0",
+    "@strapi/admin": "4.26.0",
+    "@strapi/plugin-content-manager": "4.26.0",
+    "@strapi/plugin-content-type-builder": "4.26.0",
+    "@strapi/plugin-email": "4.26.0",
+    "@strapi/plugin-graphql": "4.26.0",
+    "@strapi/plugin-i18n": "4.26.0",
+    "@strapi/plugin-upload": "4.26.0",
+    "@strapi/plugin-users-permissions": "4.26.0",
     "@strapi/provider-email-sendgrid": "^4.20.5",
-    "@strapi/strapi": "4.12.0",
+    "@strapi/strapi": "4.26.0",
+    "@strapi/types": "4.26.0",
     "@strapi/utils": "^5.0.1",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
+    "caniuse-lite": "^1.0.30001753",
     "dayjs": "^1.11.13",
     "exceljs": "^4.4.0",
     "firebase-admin": "^13.5.0",
@@ -28,9 +35,13 @@
     "npm": "^6.0.0",
     "openai": "^5.8.2",
     "pg": "^8.16.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^5.2.0",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
-    "strapi-provider-email-extra": "^0.5.0"
+    "strapi-provider-email-extra": "^0.5.0",
+    "styled-components": "^5.2.1"
   },
   "author": {
     "name": "A Strapi developer"
@@ -44,6 +55,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.10.2"
+    "@types/node": "^22.18.13"
   }
 }
