@@ -7,10 +7,12 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
+    "seed": "node scripts/seed.js",
     "build:digitalocean": "npm install --production=false && npm run build && npm ci",
     "strapi": "strapi"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@strapi/admin": "4.26.0",
     "@strapi/plugin-content-manager": "4.26.0",
     "@strapi/plugin-content-type-builder": "4.26.0",
@@ -40,6 +42,7 @@
     "react-router-dom": "^5.2.0",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
+    "strapi-plugin-import-export-entries": "^1.23.1",
     "strapi-provider-email-extra": "^0.5.0",
     "styled-components": "^5.2.1"
   },
