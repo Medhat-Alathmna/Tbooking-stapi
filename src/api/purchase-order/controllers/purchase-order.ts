@@ -4,6 +4,9 @@
 'use strict';
 import { factories } from '@strapi/strapi'
 const { DateTime } = require('luxon');
+import OpenAI from "openai";
+import fs from "fs";
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const { createCoreController } = require('@strapi/strapi').factories;
 module.exports = createCoreController('api::purchase-order.purchase-order', ({ strapi }) => ({
@@ -153,5 +156,73 @@ module.exports = createCoreController('api::purchase-order.purchase-order', ({ s
     } catch (error) {
 
     }
-  }
+  },
+     async uploadOCR(ctx) {
+    try {
+      // ✅ الملف موجود داخل ctx.request.files.files
+      const uploaded = ctx.request.files?.files;
+      if (!uploaded) return ctx.badRequest("No file uploaded");
+
+      const file = Array.isArray(uploaded) ? uploaded[0] : uploaded;
+
+      // ✅ قراءة الملف من المسار المؤقت وتحويله إلى Base64
+      const fileBuffer = fs.readFileSync(file.path);
+      const base64Image = fileBuffer.toString("base64");
+
+      // ✅ تحليل الصورة عبر OpenAI
+      const completion = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `أنت مساعد ذكاء اصطناعي متخصص في تحليل فواتير المشتريات.
+أعد النتيجة بصيغة JSON فقط وفق البنية التالية:
+{
+  "vendor": "اسم المورد",
+  "invoice_number": "رقم الفاتورة",
+  "date": "YYYY-MM-DD",
+  "items": [
+    { "name": "اسم المنتج", "qty": 0, "unit_price": 0, "total": 0 }
+  ],
+  "subtotal": 0,
+  "tax": 0,
+  "total": 0
+}`,
+          },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "حلل هذه الصورة واستخرج بيانات الفاتورة بدقة." },
+              { type: "image_url", image_url: { url: `data:${file.type};base64,${base64Image}` } },
+            ],
+          },
+        ],
+      });
+
+      // ✅ تحويل النص الناتج إلى JSON
+      const raw = completion.choices[0].message.content?.trim();
+      let resultJson;
+      try {
+        resultJson = JSON.parse(raw);
+      } catch {
+        const match = raw.match(/\{[\s\S]*\}/);
+        resultJson = match ? JSON.parse(match[0]) : { raw };
+      }
+
+      // ✅ إرجاع النتيجة
+      ctx.send({
+        message: "✅ Invoice analyzed successfully by OpenAI",
+        fileInfo: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        },
+        result: resultJson,
+      });
+
+    } catch (error) {
+      console.error("OCR Error:", error);
+      ctx.throw(500, "❌ Failed to process invoice");
+    }
+  },
 }));
