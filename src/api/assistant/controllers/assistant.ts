@@ -249,32 +249,38 @@ Your goals:
 
     // 🧠 3️⃣ إرسال البيانات الفعلية إلى GPT للتحليل النهائي
     const dataPrompt = `
-You are a data analyst for an ERP system.
-The user said: "${message}".
-Below is real JSON data from the "${entity}" collection.
-User language: ${lang}.
-do not translate field names or values, keep them as is.
-Analyze the numeric fields (total, cash, discount).
-Your tasks:
-- If intent = "summary": write a clear ${lang} summary (max 3 lines).
-- If intent = "dashboard":
-   - Use human-readable labels (${schemaInfo}).
-   - Create one or more widgets: charts or stats.
-   - Each widget must have clear and realistic data points.
+  You are a data analyst for an ERP system.
+  The user said: "${message}".
+  Below is real JSON data from the "${entity}" collection.
+  User language: ${lang}.
+  do not translate field names or values, keep them as is.
+  Analyze the numeric fields (total, cash, discount).
+  Your tasks:
+  - If intent = "summary": write a clear ${lang} summary (max 3 lines).
+  - If intent = "dashboard":
+     - Use human-readable labels (${schemaInfo}).
+     - Create one or more widgets: charts or stats or table.
+     - Each widget must have clear and realistic data points.
+     - For each widget, provide insightful discussion that includes (give your discussion in a field called "discussion"):
+     • Key trends and patterns in the data
+     • Notable changes or anomalies
+     • Business recommendations based on the data
+     • Potential actions to improve performance
+     • Risk factors to consider
+     - Avoid repeating the same widget structure as before — always recalculate.
+     - Return valid JSON only.
+     - i wanna more
+     - summarize data's widgets(label,value) in a field called "widgetsSummary" .
+     
 
-   - Avoid repeating the same widget structure as before — always recalculate.
-   - Return valid JSON only.
-   - summarize data's widgets(label,value) in a field called "widgetsSummary/ how you get this data from any data in fields subSummary" , try to mention their orderNo .
-   
-
-Output format (always use this exact structure):
-{
-  "type": "dashboard" | "summary",
-  "title": "string",
-  "entity": "${entity}",
-  "period": ${JSON.stringify(parsed.period || {})},
-  "dashboardType": "${parsed.dashboardType || "bar"}",
-  "widgets": [
+  Output format (always use this exact structure):
+  {
+    "type": "dashboard" | "summary", 
+    "title": "string",
+    "entity": "${entity}",
+    "period": ${JSON.stringify(parsed.period || {})},
+    "dashboardType": "${parsed.dashboardType || "bar"}",
+    "widgets": [
     {
       "type": "chart",
       "chartType": "bar" | "line" | "pie",
@@ -282,20 +288,19 @@ Output format (always use this exact structure):
       "data": [{"label": "string", "value": number}],
       "unit": "string",
       "widgetsSummary": "string",
-      "subSummary": "any"
+      "discussion": "string - provide actionable insights, trends analysis, and business recommendations",
     },
     {
       "type": "stat",
-      "label": "string",
+      "label": "string", 
       "data": [{"label": "count", "value": number}],
       "unit": "string"
     }
-  ],
-  "summary": {"text": "string"},
-  "suggestions": ["string", "string"]
-}
-
-`;
+    ],
+    "summary": {"text": "string"},
+    "suggestions": ["string", "string"]
+  }
+  `;
 
     const fullAnalysis = await client.chat.completions.create({
       model: "gpt-4o-mini",
