@@ -5,7 +5,7 @@ module.exports = {
     const { result } = event;
 
     // Only emit if created by mobile    
-    if (!result.createBy) {
+    if (result.platform === 'mobile') {
       if (strapi.io) {
         strapi.io.emit('new-appointment', {
           id: result.id,
