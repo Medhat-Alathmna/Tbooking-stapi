@@ -25,6 +25,7 @@
     "@strapi/strapi": "4.26.0",
     "@strapi/types": "4.26.0",
     "@strapi/utils": "^5.0.1",
+    "@toon-format/toon": "^1.0.0",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "caniuse-lite": "^1.0.30001753",
@@ -44,7 +45,8 @@
     "socket.io": "^4.8.1",
     "strapi-plugin-import-export-entries": "^1.23.1",
     "strapi-provider-email-extra": "^0.5.0",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "tiktoken": "^1.0.22"
   },
   "author": {
     "name": "A Strapi developer"

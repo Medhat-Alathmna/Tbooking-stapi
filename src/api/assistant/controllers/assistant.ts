@@ -1,6 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const OpenAI = require("openai");
+import { get_encoding } from "tiktoken";
+import { encoding_for_model } from "tiktoken";
+import { encode } from '@toon-format/toon'
+
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const today = new Date().toISOString().split('T')[0];
 
@@ -192,7 +196,6 @@ Your goals:
     });
 
     const parsed = JSON.parse(analysis.choices[0].message.content || "{}");
-    console.log("🧩 [ANALYSIS RESULT]", parsed);
 
     // 🟡 Clarify step
     if (parsed.intent === "clarify") {
@@ -225,13 +228,21 @@ Your goals:
         $lte: parsed.period.to,
       };
     }
-
-    const data = await strapi.entityService.findMany(collection, {
+const encoder = encoding_for_model("gpt-4o-mini");
+    const data:any = await strapi.entityService.findMany(collection, {
       filters,
       populate: '*',
     });
+const dataJson = JSON.stringify(data);
 
-    console.log(`📊 [${entity}] Records fetched: ${data?.length || 0}`);
+// Now it's a string, safe for encode()
+const systemTokens = encoder.encode(dataJson).length;
+    console.log(`🗂️ [${entity}] Data tokens: ${systemTokens}`);
+
+    const toonData = encode(data);
+    const toonTokens = encoder.encode(toonData).length;
+
+    console.log(`🗂️ [${entity}] Toon Data tokens: ${toonTokens}`);
 
     if (!data?.length) {
       return ctx.send({
@@ -269,7 +280,6 @@ Your goals:
      • Risk factors to consider
      - Avoid repeating the same widget structure as before — always recalculate.
      - Return valid JSON only.
-     - i wanna more
      - summarize data's widgets(label,value) in a field called "widgetsSummary" .
      
 
@@ -311,7 +321,8 @@ Your goals:
     });
 
     const aiOutput = fullAnalysis.choices[0].message.content.trim();
-    console.log("🧠 [GPT FINAL OUTPUT]", aiOutput);
+const outTokens = encoder.encode(aiOutput).length;
+    console.log(`🗂️ [${entity}] Data tokens: ${outTokens}`);
 
     let finalJSON;
     try {
