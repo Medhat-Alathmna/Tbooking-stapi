@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",
+    "@langchain/core": "^1.0.6",
+    "@langchain/openai": "^1.1.2",
     "@strapi/admin": "4.26.0",
     "@strapi/plugin-content-manager": "4.26.0",
     "@strapi/plugin-content-type-builder": "4.26.0",
@@ -33,6 +35,7 @@
     "exceljs": "^4.4.0",
     "firebase-admin": "^13.5.0",
     "google-auth-library": "^10.2.0",
+    "langchain": "^1.0.6",
     "luxon": "^3.4.2",
     "mysql": "2.18.1",
     "npm": "^6.0.0",

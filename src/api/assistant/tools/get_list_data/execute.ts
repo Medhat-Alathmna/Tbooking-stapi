@@ -1,5 +1,15 @@
 import type { Strapi } from "@strapi/strapi";
-import { allowedCollections, type AllowedCollection } from "./definition";
+
+export const allowedCollections = [
+  "appointments",
+  "orders",
+  "purchase-orders",
+  "products",
+  "services",
+  "users",
+] as const;
+
+export type AllowedCollection = (typeof allowedCollections)[number];
 
 export const COLLECTION_UID_MAP: Record<AllowedCollection, string> = {
   appointments: "api::appointment.appointment",

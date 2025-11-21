@@ -4,6 +4,10 @@ const OpenAI = require("openai");
 import { get_encoding } from "tiktoken";
 import { encoding_for_model } from "tiktoken";
 import { encode } from '@toon-format/toon'
+import {
+  getCollectionRelations,
+  getCustomFieldMeaning,
+} from "../tools/collection-meta";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const today = new Date().toISOString().split('T')[0];
@@ -61,64 +65,6 @@ function getCollectionSchemaInfo(collectionName) {
   }
 }
 
-/**
- * Custom business meanings for fields per collection
- */
-function getCustomFieldMeaning(collectionName) {
- const customMeanings = {
-    order: {
-      id: { description: "Unique internal order ID.(Do not display it)" },
-      orderNo: { description: "This is Unique order Number (Display field)" },
-      customer: { description: "Customer who placed the order. Use  (firstName + middleName + lastName ). for labels. from appointment schema" },
-      appointment: { description: "Linked appointment record (if any). Connects order to schedule data." },
-      cash: { description: "Amount paid by customer and it's called payment (use in revenue dashboards)." },
-      total: { description: "Total order value  (used for comparisons with cash)." },
-      status: {
-        description: "Order payment status.",
-        values: {
-          paid: "Fully paid.",
-          unpaid: "Partially paid.",
-          canceled: "Canceled — exclude from analytics.",
-        },
-      },
-      employee: { description: "Employee who handled the order." },
-      createdAt: { description: "Order creation date." },
-    },
-
-    appointment: {
-      id: { description: "Unique appointment ID." },
-      customer: { description: "Client who booked the appointment (firstName + middleName + lastName for labels)." },
-      employee: { description: "Assigned employee (employee.name for performance dashboards)." },
-      fromDate: { description: "Appointment start date and time." },
-      toDate: { description: "Appointment end date and time." },
-      cash: { description: "Service price booked in the appointment." },
-      approved: { description: "Indicates if the appointment is approved." },
-      deposit: { description: "Deposit amount paid at booking." },
-      paid: { description: "Amount paid (deposit or full payment)." },
-      employees: { description: "List of employees involved in the appointment, also has a services JSON booked in at appointment, may be multi employees and their have own services every each." },
-      products: { description: "Products booked in the appointment." },
-      status: {
-        description: "Appointment status.",
-        values: {
-          Draft: "Appointment drafted.",
-          Completed: "Appointment completed. that's mean converted to order.",
-          Canceled: "Appointment canceled (ignore).",
-        },
-      },
-      order: { description: "Related order created after appointment completion (appointment.order)." },
-    },
-
-    "purchase-order": {
-      id: { description: "Purchase order ID." },
-      vendor: { description: "Supplier/vendor (vendor.name for labels)." },
-      paid: { description: "Amount paid to vendor." },
-      total: { description: "Total purchase value." },
-      status: { description: "Purchase order status." },
-      createdAt: { description: "Date of purchase order creation." },
-    },
-}
-return customMeanings[collectionName] || {};
-}
 
 /* ------------------------------------------------------------------
    🧠 2. Main Assistant Controller
@@ -135,11 +81,7 @@ const isArabic = /[\u0600-\u06FF]/.test(message);
 const lang = isArabic ? "Arabic" : "English";
     // 🧩 معلومات الحقول والعلاقات
     const schemaInfo = getCustomFieldMeaning(entity);
-    const relations = {
-      order: ["appointment", "customer", "employee"],
-      appointment: ["order", "customer", "employee"],
-      "purchase-order": ["vendor"],
-    };
+    const relations = getCollectionRelations(entity);
 
     const entityMap = {
       order: "api::order.order",
@@ -163,7 +105,7 @@ Fields:
 ${JSON.stringify(schemaInfo, null, 2)}
 
 Relations:
-${JSON.stringify(relations[entity] || [], null, 2)}
+${JSON.stringify(relations || [], null, 2)}
 
 Your goals:
 1. Detect the user's intent: "summary", "dashboard", or "clarify".

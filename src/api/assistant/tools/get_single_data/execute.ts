@@ -1,12 +1,4 @@
-import {
-  allowedCollections,
-  type AllowedCollection,
-} from "../get_list_data/definition";
-import {
-  COLLECTION_UID_MAP,
-  type FilterInput,
-  type ToolExecutionContext,
-} from "../get_list_data/execute";
+import { AllowedCollection, allowedCollections, FilterInput, ToolExecutionContext, COLLECTION_UID_MAP } from "../get_list_data";
 
 const allowedSet = new Set<AllowedCollection>(allowedCollections);
 
