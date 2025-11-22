@@ -1,295 +1,94 @@
-const fs = require("fs");
-const path = require("path");
-const OpenAI = require("openai");
-import { get_encoding } from "tiktoken";
-import { encoding_for_model } from "tiktoken";
-import { encode } from '@toon-format/toon'
-import {
-  getCollectionRelations,
-  getCustomFieldMeaning,
-} from "../tools/collection-meta";
-
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const today = new Date().toISOString().split('T')[0];
-
-/* ------------------------------------------------------------------
-   🧩 1. Local helper functions
-------------------------------------------------------------------- */
-
-/**
- * Dynamically read Strapi collection schema info
- */
-function getCollectionSchemaInfo(collectionName) {
-  try {
-    const schemaPath = path.join(
-      process.cwd(),
-      "src",
-      "api",
-      collectionName,
-      "content-types",
-      collectionName,
-      "schema.json"
-    );
-
-    if (!fs.existsSync(schemaPath)) return null;
-
-    const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
-    const attributes = schema.attributes || {};
-    const fieldDescriptions = {};
-
-    for (const [key, value] of Object.entries(attributes)) {
-      if (typeof value === "object" && value !== null && "type" in value) {
-        if (value.type === "enumeration" && "enum" in value) {
-          const enumValues = Array.isArray(value.enum) ? value.enum.join(", ") : "";
-          fieldDescriptions[key] = `Enum: ${enumValues}`;
-        } else {
-          fieldDescriptions[key] = value.type || "unknown";
-        }
-
-      } else {
-        fieldDescriptions[key] = "unknown";
-      }
-    }
-
-    return {
-      name: schema.info.displayName,
-      fields: fieldDescriptions,
-      defaultDateField:
-        Object.keys(attributes).find((k) =>
-          ["date", "createdAt", "created_at"].includes(k)
-        ) || "createdAt",
-    };
-  } catch (err) {
-    console.error("Schema read error:", err.message);
-    return null;
-  }
-}
-
-
-/* ------------------------------------------------------------------
-   🧠 2. Main Assistant Controller
-------------------------------------------------------------------- */
-
+import { HumanMessage, AIMessage, SystemMessage, createAgent } from "langchain";
+import allLangChainTools from "../tools/langchain-tools";
+import { filterOperators } from "../tools/collection-meta";
 module.exports = {
+  async processChatWithLangChain(ctx: any) {
+const {
+  userMessage,
+  conversationHistory = [],
+} = ctx.request.body as {
+  userMessage: string;
+  conversationHistory?: Array<{ role: string; content: string }>;
+};
   
-async chat(ctx) {
-  try {
-    const { message, type } = ctx.request.body;
-    const today = new Date().toISOString().split("T")[0];
-    const entity = (type || "order").toLowerCase();
-const isArabic = /[\u0600-\u06FF]/.test(message);
-const lang = isArabic ? "Arabic" : "English";
-    // 🧩 معلومات الحقول والعلاقات
-    const schemaInfo = getCustomFieldMeaning(entity);
-    const relations = getCollectionRelations(entity);
+  const today = new Date().toISOString().split("T")[0];
+  const isArabic = /[\u0600-\u06FF]/.test(userMessage);
+  const lang = isArabic ? "Arabic" : "English";
+  const SYSTEM_PROMPT = `
+You are StrapiOps, an enterprise ERP assistant embedded in a salon management platform.
+Date: ${today}.
+Respond in ${lang} and mirror the user's tone while staying concise and professional.
 
-    const entityMap = {
-      order: "api::order.order",
-      "purchase-order": "api::purchase-order.purchase-order",
-      appointment: "api::appointment.appointment",
-      invoice: "api::invoice.invoice",
-      employee: "api::employee.employee",
-    };
+MISSION:
+- Decide whether the user needs a single record or a list/summary before calling tools.
+- Translate natural-language constraints into precise Strapi filters and populate settings.
+- Highlight totals, statuses, dates, and actionable follow-ups whenever data is returned.
+- Ask for clarification when identifiers or filters are ambiguous before invoking tools.
 
-    // 🧠 1️⃣ تحليل النية والفترة الزمنية
-    const analyzePrompt = `
-You are an advanced ERP AI Assistant.
-Today’s date: ${today}.
-User language: ${lang}.
+TOOLBOX:
+1. get_list_data — fetch Strapi collections with filters & populate. Use for dashboards, tables, comparisons, KPIs, and any request that says “list/show all/summarize/count”.
+2. get_single_data — fetch exactly one record. Use when a user references a specific identifier (order number, appointment number, email, etc.). If uniqueness is uncertain, confirm more context first.
 
-Context:
-- You assist in analyzing, summarizing, and visualizing ERP data.
-- Below are field meanings and relationships for the selected entity.
+TOOL PRIORITY:
+- Specific record requested → call get_single_data.
+- Multiple records, analytics, or comparisons → call get_list_data with the narrowest filters possible and populate only the fields needed for the reply.
+- When unsure which collection is relevant, ask a follow-up question instead of guessing.
 
-Fields:
-${JSON.stringify(schemaInfo, null, 2)}
+FILTER GUIDELINES:
+- Allowed collections: appointments, orders, purchase-orders, products, services, users.
+- Supported operators: ${filterOperators}.
+- Convert natural phrases like “today”, “last week”, or “pending orders over 500” into structured filters using ISO dates, numeric comparisons, and logical nesting.
 
-Relations:
-${JSON.stringify(relations || [], null, 2)}
-
-Your goals:
-1. Detect the user's intent: "summary", "dashboard", or "clarify".
-2. Detect any time range (today, last month, this week, etc.) and return ISO dates:
-   {"from": "YYYY-MM-DDT00:00", "to": "YYYY-MM-DDT23:59"}
-3. Suggest dashboard type (bar, line, pie, double-bar) if user asks for visual data.
-4. Exclude canceled or invalid records automatically.
-5. If no intent is clear, default to "summary".
-6. Return ONLY JSON using this exact format:
-
-{
-  "intent": "summary" | "dashboard" | "clarify",
-  "title": "string",
-  "entity": "${entity}",
-  "period": {"from": "YYYY-MM-DDTHH:mm", "to": "YYYY-MM-DDTHH:mm"},
-  "dashboardType": "bar" | "line" | "pie" | null,
-  "filters": {},
-  "summary": {"text": "string"},
-  "suggestions": []
-}
+RESPONSE STYLE:
+- After each tool call, summarize the findings (counts, totals, deadlines) and mention any notable relations pulled via populate.
+- Flag missing data or anomalies, and suggest practical next steps when appropriate.
+- If no tool call is needed (policy or conceptual questions), answer directly but keep the ERP context in mind.
+- When data is not found, state what was searched and recommend additional identifiers or broader filters.
 `;
 
-    const analysis = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: analyzePrompt },
-        { role: "user", content: message },
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    const parsed = JSON.parse(analysis.choices[0].message.content || "{}");
-
-    // 🟡 Clarify step
-    if (parsed.intent === "clarify") {
-      return ctx.send({
-        type: "clarify",
-        title: parsed.title || "توضيح مطلوب",
-        entity,
-        summary: parsed.summary || { text: "هل يمكنك توضيح المطلوب أكثر؟" },
-        suggestions:
-          parsed.suggestions || [
-            "هل ترغب بعرض ملخص أم لوحة بيانية؟",
-            "هل تريد بيانات هذا الشهر أم السابقة؟",
-          ],
-      });
-    }
-
-    // 🧭 2️⃣ جلب البيانات من Strapi
-    const collection = entityMap[entity];
-    if (!collection)
-      return ctx.send({
-        type: "clarify",
-        summary: { text: `⚠️ الكيان '${entity}' غير معروف.` },
-        suggestions: Object.keys(entityMap),
-      });
-
-    const filters = parsed.filters || {};
-    if (parsed.period?.from && parsed.period?.to) {
-      filters.createdAt = {
-        $gte: parsed.period.from,
-        $lte: parsed.period.to,
-      };
-    }
-const encoder = encoding_for_model("gpt-4o-mini");
-    const data:any = await strapi.entityService.findMany(collection, {
-      filters,
-      populate: '*',
-    });
-const dataJson = JSON.stringify(data);
-
-// Now it's a string, safe for encode()
-const systemTokens = encoder.encode(dataJson).length;
-    console.log(`🗂️ [${entity}] Data tokens: ${systemTokens}`);
-
-    const toonData = encode(data);
-    const toonTokens = encoder.encode(toonData).length;
-
-    console.log(`🗂️ [${entity}] Toon Data tokens: ${toonTokens}`);
-
-    if (!data?.length) {
-      return ctx.send({
-        type: "summary",
-        entity,
-        summary: {
-          text: `لم يتم العثور على أي بيانات لـ ${entity} في الفترة المحددة.`,
-        },
-        suggestions: [
-          "هل ترغب بتوسيع النطاق الزمني؟",
-          "هل تريد عرض بيانات الشهر الماضي؟",
-        ],
-      });
-    }
-
-    // 🧠 3️⃣ إرسال البيانات الفعلية إلى GPT للتحليل النهائي
-    const dataPrompt = `
-  You are a data analyst for an ERP system.
-  The user said: "${message}".
-  Below is real JSON data from the "${entity}" collection.
-  User language: ${lang}.
-  do not translate field names or values, keep them as is.
-  Analyze the numeric fields (total, cash, discount).
-  Your tasks:
-  - If intent = "summary": write a clear ${lang} summary (max 3 lines).
-  - If intent = "dashboard":
-     - Use human-readable labels (${schemaInfo}).
-     - Create one or more widgets: charts or stats or table.
-     - Each widget must have clear and realistic data points.
-     - For each widget, provide insightful discussion that includes (give your discussion in a field called "discussion"):
-     • Key trends and patterns in the data
-     • Notable changes or anomalies
-     • Business recommendations based on the data
-     • Potential actions to improve performance
-     • Risk factors to consider
-     - Avoid repeating the same widget structure as before — always recalculate.
-     - Return valid JSON only.
-     - summarize data's widgets(label,value) in a field called "widgetsSummary" .
-     
-
-  Output format (always use this exact structure):
-  {
-    "type": "dashboard" | "summary", 
-    "title": "string",
-    "entity": "${entity}",
-    "period": ${JSON.stringify(parsed.period || {})},
-    "dashboardType": "${parsed.dashboardType || "bar"}",
-    "widgets": [
-    {
-      "type": "chart",
-      "chartType": "bar" | "line" | "pie",
-      "label": "string",
-      "data": [{"label": "string", "value": number}],
-      "unit": "string",
-      "widgetsSummary": "string",
-      "discussion": "string - provide actionable insights, trends analysis, and business recommendations",
-    },
-    {
-      "type": "stat",
-      "label": "string", 
-      "data": [{"label": "count", "value": number}],
-      "unit": "string"
-    }
-    ],
-    "summary": {"text": "string"},
-    "suggestions": ["string", "string"]
-  }
-  `;
-
-    const fullAnalysis = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: dataPrompt },
-        { role: "user", content: JSON.stringify(data) },
-      ],
-    });
-
-    const aiOutput = fullAnalysis.choices[0].message.content.trim();
-const outTokens = encoder.encode(aiOutput).length;
-    console.log(`🗂️ [${entity}] Data tokens: ${outTokens}`);
-
-    let finalJSON;
-    try {
-      finalJSON = JSON.parse(aiOutput);
-    } catch (err) {
-      console.error("⚠️ JSON Parse Error:", err.message);
-      return ctx.send({
-        type: "summary",
-        entity,
-        summary: { text: "تم تحليل البيانات، لكن الرد لم يكن بتنسيق JSON صالح." },
-      });
-    }
-
-    // ✅ إرسال النتيجة النهائية
-    ctx.send(finalJSON);
-  } catch (error) {
-    console.error("❌ [Assistant Error]", error);
-    ctx.send(
-      {
-        error: "حدث خطأ أثناء تحليل البيانات.",
-        details: error.message,
+  try {
+    const agent = createAgent({
+      model: {
+        openAIApiKey: process.env.OPENAI_API_KEY,
+        maxTokens: 20000,
       },
-      500
-    );
+      tools: allLangChainTools,
+    });
+
+    const messages = [new SystemMessage(SYSTEM_PROMPT)];
+
+    conversationHistory.forEach((msg) => {
+      if (msg.role === "user") {
+        messages.push(new HumanMessage(msg.content));
+      } else if (msg.role === "assistant") {
+        messages.push(new AIMessage(msg.content));
+      }
+    });
+
+    messages.push(new HumanMessage(userMessage));
+
+    const result = await agent.invoke({ messages });
+    const lastMessage = result.messages[result.messages.length - 1];
+
+    const toolsUsed = result.messages
+      .filter((msg: any) => msg.tool_calls?.length > 0)
+      .flatMap((msg: any) => msg.tool_calls.map((tc: any) => tc.name));
+
+    console.log("[LangChain] Tools used:", toolsUsed);
+
+    return {
+      success: true,
+      response: lastMessage.content,
+      usedTool: toolsUsed.length > 0,
+      toolsUsed: [...new Set(toolsUsed)],
+    };
+  } catch(error) {
+    console.error("[LangChain] Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      response: "I'm sorry, I encountered an error processing your request.",
+    };
   }
 }
-
-};
+}

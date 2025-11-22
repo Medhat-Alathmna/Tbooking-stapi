@@ -3,16 +3,9 @@ module.exports = {
     {
       method: "POST",
       path: "/assistant",
-      handler: "assistant.chat",
+      handler: "assistant.processChatWithLangChain",
       config: { auth: false },
     },
-    {
-      method: 'POST',
-      path: '/chat-assistant/processChatWithLangChain',
-      handler: 'chat-assistant.processChatWithLangChain',
-      config: {
-        auth: false,
-      },
-    },
+   
   ],
 };
