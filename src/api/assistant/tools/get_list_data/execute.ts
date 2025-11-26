@@ -7,8 +7,16 @@ export const allowedCollections = [
   "products",
   "services",
   "users",
-] as const;
-
+] as any;
+export interface GetListDataResult {
+  success: boolean;
+  data?: {
+    results: any[];
+    total: number;
+ summarize?: string;
+  };
+  error?: string;
+}
 export type AllowedCollection = (typeof allowedCollections)[number];
 
 export const COLLECTION_UID_MAP: Record<AllowedCollection, string> = {
@@ -28,74 +36,85 @@ export interface GetListDataInput {
   populate?: string[];
 }
 
-export interface ToolExecutionContext {
-  strapi: Strapi;
+export const executeGetListData = async (
+  collection: AllowedCollection,
+  filters?: FilterInput,
+  populate?: string[]
+): Promise<any> => {
+    try {
+  if (!COLLECTION_UID_MAP[collection]) {
+    throw new Error(`Collection not allowed: ${collection}`);
+  }
+  
+    const uid = COLLECTION_UID_MAP[collection];
+
+    // ---- Normalize filters safely ----
+    let parsedFilters: Record<string, any> | undefined = undefined;
+
+    if (typeof filters === "string") {
+      // filters arrived as JSON string (from agent). Parse safely.
+      const s = (filters as string).trim();
+      if (s) {
+        try {
+          parsedFilters = JSON.parse(s);
+        } catch (err: any) {
+          return { success: false, error: `Invalid filters JSON: ${err?.message || String(err)}` };
+        }
+      }
+    } else if (filters && typeof filters === "object") {
+      parsedFilters = filters as Record<string, any>;
+    }
+
+    // If parsedFilters is undefined -> we will not pass `where` (means no filters)
+    const queryArgs: any = {};
+    if (parsedFilters && Object.keys(parsedFilters).length > 0) {
+      // Strapi expects 'where' key
+      queryArgs.where = parsedFilters;
+    }
+
+    if (populate) {
+      queryArgs.populate = populate;
+    }
+
+    // Add ordering if desired
+    queryArgs.orderBy = { createdAt: "desc" };
+
+    const results = await strapi.db.query(uid).findMany(queryArgs);
+
+    // Build display-friendly wrapper
+    const total = Array.isArray(results) ? results.length : 0;
+
+    // optional: produce a short summarize (example)
+    const summarize = `Returned ${total} rows from "${collection}"${queryArgs.where ? " with filters" : ""}.`;
+const finalResults: any[] = [];
+results.forEach((r: any) => {
+  const orderNo = r.orderNo ?? null;
+  const id = r.id ?? null;
+  const status = r.status ?? null;
+  const createdAt = r.createdAt ?? null;
+
+  let customer = null;
+  const appointment = r.appointment ?? null;
+  if (appointment && appointment.customer) {
+    const c = appointment.customer;
+    const parts = [c.firstName, c.middleName, c.lastName].filter(Boolean).map(p => String(p).trim());
+    if (parts.length) customer = parts.join(" ");
+  }
+
+  finalResults.push({ orderNo, customer, status, id, createdAt });
+});
+
+ return {
+      success: true,
+      data: {
+        results: finalResults,
+        total,
+        summarize,
+      },
+    };
+  } catch (err: any) {
+    console.error("executeGetListData error:", err);
+    return { success: false, error: err?.message ?? String(err) };
+  }
 }
 
-const allowedSet = new Set<AllowedCollection>(allowedCollections);
-
-const sanitizeFilters = (filters?: FilterInput): FilterInput | undefined => {
-  if (!filters) return undefined;
-  if (Array.isArray(filters) || typeof filters !== "object") return undefined;
-  return filters;
-};
-
-const normalizePopulate = (
-  populate?: string[]
-): string[] | "*" | undefined => {
-  if (!populate || !populate.length) return undefined;
-  if (populate.length === 1 && populate[0] === "*") {
-    return "*";
-  }
-  return populate;
-};
-
-const resolveStrapi = (ctx?: ToolExecutionContext): Strapi => {
-  if (ctx?.strapi) return ctx.strapi;
-  const globalStrapi = (globalThis as { strapi?: Strapi }).strapi;
-  if (globalStrapi) return globalStrapi;
-  throw new Error("[get_list_data] Missing Strapi instance in tool context.");
-};
-
-const fetchList = async (
-  strapiInstance: Strapi,
-  uid: any,
-  filters?: FilterInput,
-  populate?: string[] | "*" | undefined
-) => {
-  const query: Record<string, unknown> = {};
-  if (filters) query.filters = filters;
-  if (populate) query.populate = populate;
-  return strapiInstance.entityService.findMany(uid, query);
-};
-
-export const execute = async (
-  input: GetListDataInput,
-  ctx?: ToolExecutionContext
-) => {
-  const { collection, filters, populate } = input;
-
-  if (!allowedSet.has(collection)) {
-    throw new Error(
-      `[get_list_data] Unsupported collection "${collection}". Allowed: ${allowedCollections.join(
-        ", "
-      )}.`
-    );
-  }
-
-  const strapiInstance = resolveStrapi(ctx);
-  const uid = COLLECTION_UID_MAP[collection];
-  const safeFilters = sanitizeFilters(filters);
-  const populateOption = normalizePopulate(populate);
-
-  const data = await fetchList(strapiInstance, uid, safeFilters, populateOption);
-
-  return {
-    collection,
-    count: Array.isArray(data) ? data.length : 0,
-    filters: safeFilters || {},
-    data,
-  };
-};
-
-export default execute;

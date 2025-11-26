@@ -1,11 +1,6 @@
-import execute from "./execute";
+export { executeGetListData, type GetListDataResult } from './execute';
 
-export * from "./execute";
 
-const getListDataTool = {
-  
-  execute,
-};
 
-export default getListDataTool;
 
+export * from './execute';

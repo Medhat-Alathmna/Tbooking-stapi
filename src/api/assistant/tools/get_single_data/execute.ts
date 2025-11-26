@@ -1,4 +1,4 @@
-import { AllowedCollection, allowedCollections, FilterInput, ToolExecutionContext, COLLECTION_UID_MAP } from "../get_list_data";
+import { AllowedCollection, allowedCollections, FilterInput, COLLECTION_UID_MAP } from "../get_list_data";
 
 const allowedSet = new Set<AllowedCollection>(allowedCollections);
 
@@ -22,9 +22,9 @@ const normalizePopulate = (
   return populate;
 };
 
-const resolveStrapi = (ctx?: ToolExecutionContext) => {
+const resolveStrapi = (ctx?) => {
   if (ctx?.strapi) return ctx.strapi;
-  const globalStrapi = (globalThis as { strapi?: ToolExecutionContext["strapi"] })
+  const globalStrapi = (globalThis as { strapi?:any["strapi"] })
     .strapi;
   if (globalStrapi) return globalStrapi;
   throw new Error("[get_single_data] Missing Strapi instance in tool context.");
@@ -32,7 +32,7 @@ const resolveStrapi = (ctx?: ToolExecutionContext) => {
 
 const fetchSingle = async (
   input: GetSingleDataInput,
-  ctx?: ToolExecutionContext
+  ctx?: any
 ) => {
   const { collection, filters, populate } = input;
 

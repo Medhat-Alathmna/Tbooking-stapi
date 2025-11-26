@@ -112,7 +112,7 @@ export const filterOperators = [
   { operator: "$or", description: 'Logical "or" join for filters' },
   { operator: "$and", description: 'Logical "and" join for filters' },
   { operator: "$not", description: 'Logical "not" wrapper for filters' },
-] as const;
+] 
 export const getCustomFieldMeaning = (collectionName: string) =>
   collectionFieldMeanings[collectionName] || {};
 

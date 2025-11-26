@@ -1,8 +1,9 @@
 import { tool } from "langchain";
 import { z } from "zod";
 
-import executeGetListData, {
+import  {
   allowedCollections,
+  executeGetListData,
   type GetListDataInput,
 } from "./get_list_data/execute";
 import executeGetSingleData, {
@@ -21,52 +22,61 @@ const filterOperatorsHint = filterOperators
   .join("; ");
 
 export const getListDataTool = tool(
-  async (input: GetListDataInput) => {
-    const result = await executeGetListData(
-      input,
-      // Strapi instance is resolved inside execute() when not provided.
-    );
+  async ({ collection, filters, populate, _userMessage }: any) => {
+    // Normalize & validate filters (prefer object)
+    let parsedFilters: Record<string, any> | undefined = undefined;
 
-    const meta = {
-      fields: getCustomFieldMeaning(input.collection),
-      relations: getCollectionRelations(input.collection),
-    };
+    // Accept object directly
+    if (filters && typeof filters === "object" && !Array.isArray(filters)) {
+      parsedFilters = filters;
+    } else if (typeof filters === "string" && filters.trim()) {
+      // If agent still sends string, attempt parse but prefer object next time
+      try {
+        parsedFilters = JSON.parse(filters);
+        if (typeof parsedFilters !== "object" || Array.isArray(parsedFilters)) {
+          // invalid shape
+          return JSON.stringify({
+            success: false,
+            error:
+              "Filters must be a JSON object (e.g., { \"createdAt\": { \"$gte\": \"2025-08-01T00:00\", \"$lte\": \"2025-08-31T23:59\" } }). Please resend `filters` as an object, not a JSON string."
+          });
+        }
+      } catch (err: any) {
+        return JSON.stringify({
+          success: false,
+          error:
+            "Invalid filters JSON: " +
+            (err?.message || String(err)) +
+            ". Please provide filters as a JSON object (not a string). Example: {\"createdAt\": {\"$gte\":\"2025-08-01T00:00\",\"$lte\":\"2025-08-31T23:59\"}}"
+        });
+      }
+    } else {
+      // no filters provided -> undefined (means get all)
+      parsedFilters = undefined;
+    }
 
-    return JSON.stringify({ ...result, meta });
+    // Call the executor with a real object (or undefined)
+    const result = await executeGetListData(collection, parsedFilters, populate);
+
+    return JSON.stringify({ result });
   },
   {
     name: "get_list_data",
     description: `Fetch multiple ERP records (appointments, orders, purchase-orders, products, services, or users) with optional filters and populated relations.
 
-Use this tool when a user requests:
-- Lists, tables, or summaries of ERP entities (e.g., "Show upcoming appointments", "List paid orders last week").
-- Counts or basic analytics that require the raw records (you can count/summarize after receiving the list).
-- Detect any time range (today, last month, this week, etc.) and return ISO dates:
-   {"from": "YYYY-MM-DDT00:00", "to": "YYYY-MM-DDT23:59"}
-- If not mentioned a time range,do not add date time filter.   
-- A dataset that includes related entities (employees, customers, vendors, etc.) by specifying populate fields or ["*"] for everything.
-- When entity is Order specifying populate fields [Appointment] 
-Always provide precise filters when users mention identifiers, dates, or statuses.
-If users want everything, omit filters. Set populate to ["*"] only when you truly need all relations.`,
+IMPORTANT: When calling this tool, pass 'filters' as a JSON object (not a JSON string). Example:
+{"collection":"orders", "filters": {"createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
+
+If you send filters as a string and it's invalid JSON the tool will return a helpful error asking you to resend filters as an object.`,
     schema: z.object({
       collection: z
         .enum(allowedCollections)
-        .describe(
-          "Target collection name. One of appointments, orders (Invoices), purchase-orders, products, services, users."
-        ),
-      filters: z
-        .record(z.string(), z.unknown())
-        .optional()
-        .describe(
-          `Optional Strapi-compatible filters. Supported operators: ${filterOperatorsHint}. Combine them in nested objects, e.g. {"orderNo":{"$eq":"INV-1001"},"$and":[{"status":{"$eq":"paid"}},{"createdAt":{"$between":["2025-01-01","2025-01-31"]}}]}`
-        ),
-      populate: z
-        .array(z.string())
-        .optional()
-        .describe(
-          'Optional relations to populate (["*"] fills everything, otherwise list relation keys).'
-        ),
-    }),
+        .describe("Target collection name."),
+      // Accept either object or string but prefer object
+      filters: z.union([z.record(z.any()), z.string()]).optional()
+        .describe("Optional Strapi-compatible filters. **Send as an object**, e.g. {\"status\":{\"$eq\":\"paid\"}, \"createdAt\": {\"$gte\":\"2025-08-01T00:00\",\"$lte\":\"2025-08-31T23:59\"}}"),
+      populate: z.array(z.string()).optional().describe('Optional relations to populate (["*"] fills everything).')
+    })
   }
 );
 
@@ -109,4 +119,3 @@ Use this tool when a user references a specific identifier (order/invoice number
 
 export const allLangChainTools = [getListDataTool, getSingleDataTool];
 
-export default allLangChainTools;
