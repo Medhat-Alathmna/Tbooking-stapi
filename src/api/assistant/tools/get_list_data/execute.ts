@@ -81,17 +81,13 @@ export const executeGetListData = async (
 
     const results = await strapi.db.query(uid).findMany(queryArgs);
 
-    // Build display-friendly wrapper
-    const total = Array.isArray(results) ? results.length : 0;
-
-    // optional: produce a short summarize (example)
-    const summarize = `Returned ${total} rows from "${collection}"${queryArgs.where ? " with filters" : ""}.`;
 const finalResults: any[] = [];
 results.forEach((r: any) => {
   const orderNo = r.orderNo ?? null;
   const id = r.id ?? null;
   const status = r.status ?? null;
   const createdAt = r.createdAt ?? null;
+  const cash=r.cash??0
 
   let customer = null;
   const appointment = r.appointment ?? null;
@@ -101,15 +97,14 @@ results.forEach((r: any) => {
     if (parts.length) customer = parts.join(" ");
   }
 
-  finalResults.push({ orderNo, customer, status, id, createdAt });
+  finalResults.push({ orderNo, customer, status, id, createdAt,cash });
 });
 
  return {
       success: true,
       data: {
-        results: finalResults,
-        total,
-        summarize,
+        results: results,
+
       },
     };
   } catch (err: any) {

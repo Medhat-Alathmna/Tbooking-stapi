@@ -45,7 +45,10 @@ TOOL PRIORITY:
 Important for get_list_data:
 - Always pass 'filters' as a JSON OBJECT (not a string). Example:
   {"collection":"orders", "filters": {"createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
-
+- When collection is "orders" and you need customer name, always include populate: ["appointment"].  
+- ignore paymentMethod filed
+***get_chart_data***
+- When want to call get_chart_data , First call get_list_data and then call get_chart_data until get_chart_data tool take his data form get_list_data tool
 Correct: filters is an object.
 Incorrect: filters is a JSON string like "{\"createdAt\":{\"$gte\":\"...\",\"$lte\":\"...\"}}"
 
@@ -55,6 +58,14 @@ GUIDELINES:
 - If the user asks for a narrowed list (dates, statuses, numeric thresholds, customer name, etc.) you MUST include a 'filters' object in the tool call.
 - If the user asked "all" or didn't specify constraints, omit filters.
 - When asking for orders prefer populate: [\"appointment\"] to include Customer name (first+middle+last).
+IMPORTANT RULE FOR CHARTS:
+get_chart_data REQUIRES RAW DATA (rows). 
+You MUST always call get_list_data FIRST to fetch the records, 
+then pass its result.rows into get_chart_data.
+
+Never call get_chart_data directly without rows.
+ If get_chart_data is called without rows, this is an error. 
+You must re-run get_list_data, then re-call get_chart_data with rows
 
 RESPONSE STYLE:
 - After each tool call, summarize the findings (counts, totals, deadlines,filters) and mention any notable relations pulled via populate.
@@ -110,7 +121,6 @@ RESPONSE STYLE:
 
 
 
-        // console.log('toolMsg', toolMsg);
 
         if (!toolMsg) return { used: true, data: null };
 
@@ -118,6 +128,8 @@ RESPONSE STYLE:
         try {
           const raw = toolMsg.kwargs?.content ?? toolMsg.content;
           parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+          console.log('paresed:',parsed);
+          
         } catch (e) {
           console.error("Parse error:", e);
           return { used: true, data: null };
@@ -132,12 +144,13 @@ RESPONSE STYLE:
             return {
               used: true,
               data: finalResults,       // ← جاهزة لمكوّن جدول
-              summary: payload.data?.summarize ?? null,
             };
           }
 
           case "get_chart_data": {
             const payload = parsed;
+            console.log(payload);
+            
             const arr = payload.series?.map((s) => ({
               metal: s.metal,
               points: s.data.map((p) => p.value),
@@ -167,7 +180,6 @@ RESPONSE STYLE:
 
       // استخراج نتيجة أداة get_time_chart_data
       const chartData = extractToolResult(result, "get_chart_data");
-      console.log(listData);
 
 
       return {
