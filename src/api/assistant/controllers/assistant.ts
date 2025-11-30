@@ -21,23 +21,22 @@ Date: ${today}.
 Respond in ${lang} and mirror the user's tone while staying concise and professional.
 System fields :${collectionFieldMeanings}(Don't insert fields that are not in this list).
 
-MISSION:
-- Decide whether the user needs a single record or a list/summary before calling tools.
-- Translate natural-language constraints into precise Strapi filters and populate settings.
-- Highlight totals, statuses, dates, and actionable follow-ups whenever data is returned.
-- Ask for clarification when identifiers or filters are ambiguous before invoking tools.
 
 TOOLBOX:
-1. get_list_data — fetch Strapi collections with filters & populate. Use for  tables,, KPIs, and any request that says “list/show all/summarize/count”, Don't forget the current time date is Date: ${today}.
+1. get_list_data — fetch Strapi collections with filters & populate. Use for  tables,, KPIs, and any request that says “list/show all.
 2. get_single_data — fetch exactly one record. Use when a user references a specific identifier (order number, appointment number, email, etc.). If uniqueness is uncertain, confirm more context first.
 3. get_chart_data -- fetch time-series data for charts (e.g., revenue over time, appointments per day). Use when the user requests trends, graphs,dashboards,comparison or performance over periods.
 
+Policy: For order queries use collections "orders" or "purchaseOrders" only.
+Default filter: exclude statuses "Cancelled" and "Draft" unless the user explicitly requests them.
+If user requests cancelled/draft, set includeStatuses to the exact status names (["Cancelled"], ["Draft"], or both).
+Always call get_list_data first and then pass its rows to get_chart_data for charts.
+Do not invent status names or collections. If unclear, ask the user.
 
 
 TOOL PRIORITY:
 - Specific record requested → call get_single_data.
 - Multiple records → call get_list_data with the narrowest filters possible and populate only the fields needed for the reply.
-- When unsure which collection is relevant, ask a follow-up question instead of guessing.
 
 ****get_list_data*****
 - Detect any time range (today, last month, this week, etc.) and return ISO dates (get_list_data):
@@ -47,35 +46,15 @@ Important for get_list_data:
 - Always pass 'filters' as a JSON OBJECT (not a string). Example:
   {"collection":"orders", "filters": {"createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
 - When collection is "orders" and you need customer name, always include populate: ["appointment"].  
-- ignore paymentMethod filed
 ***get_chart_data***
 - Rule: When user asks for a chart, first call get_list_data to fetch rows, then call get_chart_data with those rows.
 - Always provide rows (raw data) fetched via get_list_data into get_chart_data.
 - Always specify metric, entity, chartType, xLabel, yLabel in get_chart_data.
-EXAMPLE:
-User: "Show me a revenue chart for November by day."
-Agent steps:
-1) Call get_list_data with collection="orders" and filters for the date range.
-   -> get_list_data(... ) returns result.data.results (rows)
-2) Call get_chart_data with { metric: "revenue", entity: "orders", chartType: "line", xLabel: "date", yLabel: "revenue", rows: result.data.results }
-3) Return the chart JSON to the user.
 
-Rule: Always follow the 1) -> 2) sequence for charts.
-
-If you are not sure what fields exist, ask the user a clarifying question before calling the tool.
-When possible, include a narrow 'where' filter (dates, statuses, customer id) rather than fetching everything.
 GUIDELINES:
 - If the user asks for a narrowed list (dates, statuses, numeric thresholds, customer name, etc.) you MUST include a 'filters' object in the tool call.
 - If the user asked "all" or didn't specify constraints, omit filters.
 - When asking for orders prefer populate: [\"appointment\"] to include Customer name (first+middle+last).
-IMPORTANT RULE FOR CHARTS:
-Never call get_chart_data directly without rows.
- If get_chart_data is called without rows, this is an error. 
-You must re-run get_list_data, then re-call get_chart_data with rows
-
-RESPONSE STYLE:
-- After each tool call, summarize the findings (counts, totals, deadlines,filters) and mention any notable relations pulled via populate.
-
 `;
 
     try {
@@ -134,7 +113,6 @@ RESPONSE STYLE:
         try {
           const raw = toolMsg.kwargs?.content ?? toolMsg.content;
           parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-          console.log('paresed:',parsed);
           
         } catch (e) {
           console.error("Parse error:", e);
@@ -155,7 +133,7 @@ RESPONSE STYLE:
 
           case "get_chart_data": {
             const payload = parsed;
-            console.log(payload);
+            console.log('get_chart_data: ',payload);
             
             const arr = payload.series?.map((s) => ({
               metal: s.metal,

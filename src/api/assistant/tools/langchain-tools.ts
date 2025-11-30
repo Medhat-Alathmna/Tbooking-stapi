@@ -61,26 +61,27 @@ export const getListDataTool = tool(
     const result = await executeGetListData(collection, parsedFilters, populate);
 
     return JSON.stringify(result);
-    },
-    {
+  },
+  {
     name: "get_list_data",
     description: `Fetch multiple ERP records (appointments, orders, purchase-orders, products, services, or users) with optional filters and populated relations.
 
   **Important:** Always pass filters as a JSON object, never as a string.
-  Example: {"collection":"orders", "filters": {"status":{"$eq":"paid"}, "createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
+  Example: {"collection":"orders", "filters": {"status":{"$ne":"Cancelled"}, "createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
   **Key guidelines:**
   - For "orders" collection: Always include populate: ["appointment"] to retrieve customer name.
-  - For collections with order/purchase-order relations: Exclude "Canceled" and "draft" statuses.
-  - If filters fail validation, the tool returns a detailed error—resend as a properly formatted object.`,
+- By DEFAULT, **exclude** records whose status equals "Cancelled" or "Draft" (filters": {"status":{"$ne":"Cancelled"}). 
+- Only include "Cancelled" or "Draft" records if the user explicitly asks for them .  
+`,
     schema: z.object({
       collection: z
-      .enum(allowedCollections)
-      .describe("Target collection name."),
+        .enum(allowedCollections)
+        .describe("Target collection name."),
       // Accept either object or string but prefer object
       filters: z.union([z.record(z.any()), z.string()])
-        .describe(" Strapi-compatible filters. **Send as an object**, e.g. {\"status\":{\"$eq\":\"paid\"}, \"createdAt\": {\"$gte\":\"2025-08-01T00:00\",\"$lte\":\"2025-08-31T23:59\"}}" +
-        `  "you can use these operators in filters: " + ${filterOperatorsHint}`
-         ),
+        .describe(" Strapi-compatible filters. **Send as an object**, e.g. {\"status\":{\"$ne\":\"Cancelled\"}, \"createdAt\": {\"$gte\":\"2025-08-01T00:00\",\"$lte\":\"2025-08-31T23:59\"}}" +
+          `  "you can use these operators in filters: " + ${filterOperatorsHint}`
+        ),
       populate: z.array(z.string()).optional().describe('Optional relations to populate (["*"] fills everything).Always when collection has value an order , populate must include "appointment" to get customer name.'),
       sort: z.record(z.string()).optional(),
     })
@@ -96,8 +97,8 @@ export const timeChartDataTool = tool(
     rows, // optional — may also come per-series
   }) => {
     const opts = {
-          metric,
-    entity,
+      metric,
+      entity,
       chartType,
       xLabel,
       yLabel,
@@ -113,30 +114,27 @@ export const timeChartDataTool = tool(
     description: `
       "Optional. Array of raw records previously returned by get_list_data (result.data.results). " +
     "Preferred flow: the agent should first call get_list_data(...) and then call get_chart_data(...) passing those rows here. " +
-    "If omitted, the agent must also pass alternative inputs (collection, startDate, endDate) so server-side code can fetch rows."
     `,
 
     schema: z.object({
-      rows: z.array(z.record(z.string(), z.any())).optional()
+      rows: z.any().optional()
         .describe(
           "Don't call get_chart_data without rows" +
-          "Raw rows previously fetched via get_list_data tool." +
-          "result.data.results this schema returned from get_list_data tool"
+          "Raw rows previously fetched via get_list_data tool."
 
         ),
       metric: z
         .string()
         .describe(
           "Metric name (e.g. 'revenue', 'orders_count','cash',anything countable). " +
-                "Represents the value being charted."
+          "Represents the value being charted."
         ),
 
       entity: z
         .string()
         .describe(
-          "Shorthand entity name to disambiguate the metric."+
-           "Entity/collection name (e.g. 'orders', 'appointments')/ Dates. " +
-                "Helps the agent map the metric to the right dataset."
+          "Entity/collection name (e.g. 'orders', 'appointments')/ Dates. " +
+          "Helps the agent map the metric to the right dataset."
         ),
       chartType: z
         .enum(["line", "bar", "area", "pie"])
@@ -147,7 +145,7 @@ export const timeChartDataTool = tool(
 
       yLabel: z
         .string()
-        .describe("Y-axis label. Often depends on the metric."),
+        .describe("Y-axis label"),
     })
   }
 );

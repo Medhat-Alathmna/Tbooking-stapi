@@ -21,8 +21,10 @@ export type ChartOpts = {
 export const executeTimeChartDataTool = async (
   opts: ChartOpts
 ): Promise<any> => {
-  const { rows = [], metric, entity, chartType, xLabel, yLabel } = opts;
+  const { rows , metric, entity, chartType, xLabel, yLabel } = opts;
   // بسيط: group by day using createdAt or date field
+  console.log(opts);
+  
   const grouped: Record<string, number> = {};
   for (const r of rows || []) {
     const d = r.createdAt ? new Date(r.createdAt).toISOString().slice(0,10) : (r.date ? new Date(r.date).toISOString().slice(0,10) : null);
