@@ -185,7 +185,7 @@ module.exports = createCoreController('api::appointment.appointment', ({ strapi 
     },
     async servicesMobile(ctx) {
         try {
-            const entities = await strapi.entityService.findMany('api::service.service');
+            const entities = await strapi.entityService.opMany('api::service.service');
             ctx.send(entities);
         } catch (error) {
             ctx.send({ message: error, error });

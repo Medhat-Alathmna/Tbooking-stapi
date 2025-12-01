@@ -38,73 +38,123 @@ export interface GetListDataInput {
 
 export const executeGetListData = async (
   collection: AllowedCollection,
-  filters?: FilterInput,
+  filters?: FilterInput | string,
   populate?: string[]
 ): Promise<any> => {
     try {
+  // Validate collection
   if (!COLLECTION_UID_MAP[collection]) {
     throw new Error(`Collection not allowed: ${collection}`);
   }
-  
+
     const uid = COLLECTION_UID_MAP[collection];
 
-    // ---- Normalize filters safely ----
+    // Normalize filters: accept both object and string (for backward compatibility)
     let parsedFilters: Record<string, any> | undefined = undefined;
 
     if (typeof filters === "string") {
-      // filters arrived as JSON string (from agent). Parse safely.
-      const s = (filters as string).trim();
-      if (s) {
+      const trimmed = filters.trim();
+      if (trimmed) {
         try {
-          parsedFilters = JSON.parse(s);
+          parsedFilters = JSON.parse(trimmed);
+          // Validate that parsed result is an object
+          if (typeof parsedFilters !== "object" || Array.isArray(parsedFilters)) {
+            return {
+              success: false,
+              error: "Filters must be a JSON object, not an array or primitive. Example: {\"status\":{\"$ne\":\"Cancelled\"}}"
+            };
+          }
         } catch (err: any) {
-          return { success: false, error: `Invalid filters JSON: ${err?.message || String(err)}` };
+          return {
+            success: false,
+            error: `Invalid filters JSON: ${err?.message || String(err)}. Provide filters as an object.`
+          };
         }
       }
-    } else if (filters && typeof filters === "object") {
+    } else if (filters && typeof filters === "object" && !Array.isArray(filters)) {
       parsedFilters = filters as Record<string, any>;
+    } else if (filters !== undefined && filters !== null) {
+      return {
+        success: false,
+        error: "Filters must be either a JSON object or a valid JSON string."
+      };
     }
 
-    // If parsedFilters is undefined -> we will not pass `where` (means no filters)
+    // Build query arguments
     const queryArgs: any = {};
+
+    // Apply default status filter for orders and purchase-orders
+    // Automatically exclude "Cancelled" and "Draft" unless explicitly requested
+    const isOrderCollection = collection === 'orders' || collection === 'purchase-orders';
+
+    if (isOrderCollection) {
+      // Check if user explicitly requested Cancelled or Draft statuses
+      const hasStatusFilter = parsedFilters?.status !== undefined;
+      const requestedCancelledOrDraft = hasStatusFilter && (
+        parsedFilters.status === 'Cancelled' ||
+        parsedFilters.status === 'Draft' ||
+        parsedFilters.status?.$in?.includes('Cancelled') ||
+        parsedFilters.status?.$in?.includes('Draft') ||
+        parsedFilters.status?.$eq === 'Cancelled' ||
+        parsedFilters.status?.$eq === 'Draft'
+      );
+
+      // If user didn't explicitly request Cancelled/Draft, add default filter
+      if (!requestedCancelledOrDraft) {
+        if (!parsedFilters) {
+          parsedFilters = {};
+        }
+
+        // Only add the filter if there's no existing status filter
+        if (!hasStatusFilter) {
+          parsedFilters.status = { $notIn: ['Cancelled', 'Draft'] };
+        }
+      }
+    }
+
     if (parsedFilters && Object.keys(parsedFilters).length > 0) {
-      // Strapi expects 'where' key
       queryArgs.where = parsedFilters;
     }
 
-    if (populate) {
+    if (populate && populate.length > 0) {
       queryArgs.populate = populate;
     }
 
-    // Add ordering if desired
+    // Default ordering by creation date (newest first)
     queryArgs.orderBy = { createdAt: "desc" };
 
     const results = await strapi.db.query(uid).findMany(queryArgs);
 
+// Transform results to a cleaner, more consistent format
 const finalResults: any[] = [];
 results.forEach((r: any) => {
   const orderNo = r.orderNo ?? null;
   const id = r.id ?? null;
   const status = r.status ?? null;
   const createdAt = r.createdAt ?? null;
-  const cash=r.cash??0
+  const cash = r.cash ?? 0;
 
+  // Extract customer name from nested appointment relation
   let customer = null;
   const appointment = r.appointment ?? null;
   if (appointment && appointment.customer) {
     const c = appointment.customer;
-    const parts = [c.firstName, c.middleName, c.lastName].filter(Boolean).map(p => String(p).trim());
-    if (parts.length) customer = parts.join(" ");
+    const parts = [c.firstName, c.middleName, c.lastName]
+      .filter(Boolean)
+      .map(p => String(p).trim());
+    if (parts.length) {
+      customer = parts.join(" ");
+    }
   }
 
-  finalResults.push({ orderNo, customer, status, id, createdAt,cash });
+  finalResults.push({ orderNo, customer, status, id, createdAt, cash });
 });
 
  return {
       success: true,
       data: {
-        results: results,
-
+        results: finalResults,
+        total: finalResults.length,
       },
     };
   } catch (err: any) {

@@ -1,91 +1,184 @@
 import { AllowedCollection, allowedCollections, FilterInput, COLLECTION_UID_MAP } from "../get_list_data";
 
-const allowedSet = new Set<AllowedCollection>(allowedCollections);
-
 export interface GetSingleDataInput {
   collection: AllowedCollection;
   filters: FilterInput;
   populate?: string[];
 }
 
-const sanitizeFilters = (filters?: FilterInput): FilterInput | undefined => {
-  if (!filters) return undefined;
-  if (Array.isArray(filters) || typeof filters !== "object") return undefined;
-  return filters;
-};
-
-const normalizePopulate = (
-  populate?: string[]
-): string[] | "*" | undefined => {
-  if (!populate || !populate.length) return undefined;
-  if (populate.length === 1 && populate[0] === "*") return "*";
-  return populate;
-};
-
-const resolveStrapi = (ctx?) => {
-  if (ctx?.strapi) return ctx.strapi;
-  const globalStrapi = (globalThis as { strapi?:any["strapi"] })
-    .strapi;
-  if (globalStrapi) return globalStrapi;
-  throw new Error("[get_single_data] Missing Strapi instance in tool context.");
-};
-
-const fetchSingle = async (
-  input: GetSingleDataInput,
-  ctx?: any
-) => {
-  const { collection, filters, populate } = input;
-
-  if (!allowedSet.has(collection)) {
-    throw new Error(
-      `[get_single_data] Unsupported collection "${collection}". Allowed: ${allowedCollections.join(
-        ", "
-      )}.`
-    );
-  }
-
-  const safeFilters = sanitizeFilters(filters);
-  if (!safeFilters || !Object.keys(safeFilters).length) {
-    throw new Error(
-      "[get_single_data] Missing filters. Provide at least one identifier (e.g., orderNo, appointment number)."
-    );
-  }
-
-  const populateOption = normalizePopulate(populate);
-  const strapiInstance = resolveStrapi(ctx);
-  const uid:any = COLLECTION_UID_MAP[collection];
-
-  const query: Record<string, unknown> = {
-    filters: safeFilters,
-    pagination: { limit: 2 },
+export interface GetSingleDataResult {
+  success: boolean;
+  data?: {
+    id: number;
+    type: string;
+    displayName: string;
+    record: any;
+  } | {
+    multiple: true;
+    matches: Array<{
+      id: number;
+      type: string;
+      displayName: string;
+    }>;
   };
+  error?: string;
+}
 
-  if (populateOption) {
-    query.populate = populateOption;
+// Helper: Build display name based on collection type
+const buildDisplayName = (collection: AllowedCollection, record: any): string => {
+  switch (collection) {
+    case 'orders':
+      // orderNo + customer name
+      const orderNo = record.orderNo || 'N/A';
+      let customerName = '';
+
+      if (record.appointment?.customer) {
+        const c = record.appointment.customer;
+        const parts = [c.firstName, c.middleName, c.lastName]
+          .filter(Boolean)
+          .map(p => String(p).trim());
+        customerName = parts.length ? ` - ${parts.join(' ')}` : '';
+      }
+
+      return `${orderNo}${customerName}`;
+
+    case 'appointments':
+      // customer name + date
+      let appointmentCustomer = '';
+      if (record.customer) {
+        const c = record.customer;
+        const parts = [c.firstName, c.middleName, c.lastName]
+          .filter(Boolean)
+          .map(p => String(p).trim());
+        appointmentCustomer = parts.join(' ');
+      }
+
+      const fromDate = record.fromDate ? new Date(record.fromDate).toLocaleDateString() : '';
+      return appointmentCustomer ? `${appointmentCustomer} - ${fromDate}` : fromDate;
+
+    case 'purchase-orders':
+      // vendor name or ID
+      const vendorName = record.vendor?.name || `Purchase #${record.id}`;
+      return vendorName;
+
+    case 'products':
+      // product name
+      return record.name || `Product #${record.id}`;
+
+    case 'services':
+      // service name
+      return record.name || `Service #${record.id}`;
+
+    case 'users':
+      // user full name or email
+      if (record.firstName || record.lastName) {
+        const parts = [record.firstName, record.middleName, record.lastName]
+          .filter(Boolean)
+          .map(p => String(p).trim());
+        return parts.join(' ');
+      }
+      return record.email || record.username || `User #${record.id}`;
+
+    default:
+      return `${collection} #${record.id}`;
   }
-
-  const results = await strapiInstance.entityService.findMany(uid, query);
-
-  if (!results || !Array.isArray(results) || results.length === 0) {
-    throw new Error(
-      `[get_single_data] No ${collection} entry matched the provided filters.`
-    );
-  }
-
-  if (results.length > 1) {
-    throw new Error(
-      `[get_single_data] Found multiple ${collection} entries for the provided filters. Refine them using additional unique fields (see getCustomFieldMeaning in assistant.ts).`
-    );
-  }
-
-  return {
-    collection,
-    filters: safeFilters,
-    record: results[0],
-  };
 };
 
-export const execute = fetchSingle;
+// Main execution function
+export const executeGetSingleData = async (
+  input: GetSingleDataInput
+): Promise<GetSingleDataResult> => {
+  try {
+    const { collection, filters, populate } = input;
 
-export default execute;
+    // Validate collection
+    if (!allowedCollections.includes(collection)) {
+      return {
+        success: false,
+        error: `Unsupported collection "${collection}". Allowed: ${allowedCollections.join(', ')}.`
+      };
+    }
 
+    // Validate filters
+    if (!filters || typeof filters !== 'object' || Array.isArray(filters)) {
+      return {
+        success: false,
+        error: 'Missing or invalid filters. Provide at least one identifier (e.g., orderNo, id, email).'
+      };
+    }
+
+    if (Object.keys(filters).length === 0) {
+      return {
+        success: false,
+        error: 'Filters cannot be empty. Provide at least one identifier.'
+      };
+    }
+
+    const uid = COLLECTION_UID_MAP[collection];
+
+    // Build query
+    const queryArgs: any = {
+      where: filters,
+      limit: 5, // Fetch up to 5 to detect multiple matches
+    };
+
+    // Auto-populate for orders to get customer name
+    if (collection === 'orders') {
+      queryArgs.populate = populate && populate.length > 0
+        ? populate
+        : ['appointment.customer'];
+    } else if (populate && populate.length > 0) {
+      queryArgs.populate = populate;
+    }
+
+    // Execute query
+    const results = await strapi.db.query(uid).findMany(queryArgs);
+
+    // No results found
+    if (!results || results.length === 0) {
+      return {
+        success: false,
+        error: `No ${collection} record found matching the provided filters.`
+      };
+    }
+
+    // Multiple results found
+    if (results.length > 1) {
+      const matches = results.map(r => ({
+        id: r.id,
+        type: collection,
+        displayName: buildDisplayName(collection, r)
+      }));
+
+      return {
+        success: true,
+        data: {
+          multiple: true,
+          matches
+        }
+      };
+    }
+
+    // Single result found - success!
+    const record = results[0];
+
+    return {
+      success: true,
+      data: {
+        id: record.id,
+        type: collection,
+        displayName: buildDisplayName(collection, record),
+        record: record  // Full record for LLM to use
+      }
+    };
+
+  } catch (err: any) {
+    console.error('[get_single_data] Error:', err);
+    return {
+      success: false,
+      error: err?.message || String(err)
+    };
+  }
+};
+
+export default executeGetSingleData;
