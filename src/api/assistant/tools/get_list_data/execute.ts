@@ -83,6 +83,22 @@ export const executeGetListData = async (
     // Build query arguments
     const queryArgs: any = {};
 
+    // Initialize parsedFilters if needed
+    if (!parsedFilters) {
+      parsedFilters = {};
+    }
+
+    // PERMANENTLY exclude hidden records (soft delete) for collections that support it
+    // Collections with hide field: services, purchase-orders, products, vendors
+    // This filter CANNOT be overridden - hidden records are never accessible
+    const collectionsWithHide = ['services', 'purchase-orders', 'products', 'vendors'];
+
+    if (collectionsWithHide.includes(collection)) {
+      // Force hide filter - remove any user-provided hide filter
+      delete parsedFilters?.hide;
+      parsedFilters.hide = { $ne: true };
+    }
+
     // Apply default status filter for orders and purchase-orders
     // Automatically exclude "Cancelled" and "Draft" unless explicitly requested
     const isOrderCollection = collection === 'orders' || collection === 'purchase-orders';
@@ -101,10 +117,6 @@ export const executeGetListData = async (
 
       // If user didn't explicitly request Cancelled/Draft, add default filter
       if (!requestedCancelledOrDraft) {
-        if (!parsedFilters) {
-          parsedFilters = {};
-        }
-
         // Only add the filter if there's no existing status filter
         if (!hasStatusFilter) {
           parsedFilters.status = { $notIn: ['Cancelled', 'Draft'] };
@@ -125,32 +137,39 @@ export const executeGetListData = async (
 
     const results = await strapi.db.query(uid).findMany(queryArgs);
 
-// Transform results to a cleaner, more consistent format
-const finalResults: any[] = [];
-results.forEach((r: any) => {
-  const orderNo = r.orderNo ?? null;
-  const id = r.id ?? null;
-  const status = r.status ?? null;
-  const createdAt = r.createdAt ?? null;
-  const cash = r.cash ?? 0;
+    // Transform results based on collection type
+    let finalResults: any[] = [];
 
-  // Extract customer name from nested appointment relation
-  let customer = null;
-  const appointment = r.appointment ?? null;
-  if (appointment && appointment.customer) {
-    const c = appointment.customer;
-    const parts = [c.firstName, c.middleName, c.lastName]
-      .filter(Boolean)
-      .map(p => String(p).trim());
-    if (parts.length) {
-      customer = parts.join(" ");
+    if (collection === 'orders' || collection === 'purchase-orders') {
+      // Special formatting for order-like collections
+      finalResults = results.map((r: any) => {
+        const orderNo = r.orderNo ?? null;
+        const id = r.id ?? null;
+        const status = r.status ?? null;
+        const createdAt = r.createdAt ?? null;
+        const cash = r.cash ?? 0;
+
+        // Extract customer name from nested appointment relation
+        let customer = null;
+        const appointment = r.appointment ?? null;
+        if (appointment && appointment.customer) {
+          const c = appointment.customer;
+          const parts = [c.firstName, c.middleName, c.lastName]
+            .filter(Boolean)
+            .map(p => String(p).trim());
+          if (parts.length) {
+            customer = parts.join(" ");
+          }
+        }
+
+        return { orderNo, customer, status, id, createdAt, cash };
+      });
+    } else {
+      // For other collections, return results as-is
+      finalResults = results;
     }
-  }
 
-  finalResults.push({ orderNo, customer, status, id, createdAt, cash });
-});
-
- return {
+    return {
       success: true,
       data: {
         results: finalResults,

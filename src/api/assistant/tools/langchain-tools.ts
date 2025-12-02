@@ -35,6 +35,9 @@ export const getListDataTool = tool(
 
   **Important:** Always pass filters as a JSON object, never as a string.
   Example: {"collection":"orders", "filters": {"createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}}, "populate":["appointment"]}
+   **Important:** Always Filter has property hide false, Hide mean here record is deleted
+     Example: {"collection":"orders", "filters": {"createdAt": {"$gte":"2025-08-01T00:00","$lte":"2025-08-31T23:59"}"hide":$eq:false}, "populate":["appointment"]}
+
 
   **Key guidelines:**
   - For "orders" collection: Always include populate: ["appointment"] to retrieve customer name.

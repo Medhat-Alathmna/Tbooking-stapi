@@ -33,7 +33,13 @@ const collectionFieldMeanings: Record<string, CollectionFieldMeanings> = {
     employee: { description: "Employee who handled the order." },
     createdAt: { description: "Order creation date." },
   },
-
+  service: {
+    en: { description: "Service name in English." },
+    ar: { description: "Service name in Arabic." },
+    deletedBy: { description: "User who deleted the service (if applicable)." },
+    price: { description: "Service price." },
+    hide: { description: "Flag to hide the service from display." },
+    },
   appointment: {
     id: { description: "Unique appointment ID." },
     customer: {
@@ -68,15 +74,54 @@ const collectionFieldMeanings: Record<string, CollectionFieldMeanings> = {
         "Related order created after appointment completion (appointment.order).",
     },
   },
-
   "purchase-order": {
     id: { description: "Purchase order ID." },
-    vendor: { description: "Supplier/vendor (vendor.name for labels)." },
-    paid: { description: "Amount paid to vendor." },
-    total: { description: "Total purchase value." },
-    status: { description: "Purchase order status." },
-    createdAt: { description: "Date of purchase order creation." },
+    no: { description: "Unique purchase receipt number." },
+    status: {
+      description: "Purchase receipt status.",
+      values: {
+        Draft: "Receipt drafted.",
+        Paid: "Receipt fully paid.",
+        Unpaid: "Receipt unpaid / partial paid.",
+        Canceled: "Receipt canceled.",
+      },
+    },
+    cash: { description: "Amount paid for purchase." },
+    vendor: { description: "Vendor/supplier (vendor.name for labels)." },
+    products: { description: "Products included in the receipt." },
+    payments: { description: "Payment details and history." },
+    createBy: { description: "User who created the receipt." },
+    addedToStuck: { description: "Flag indicating if products were added to stock." },
+    pic: { description: "Attached images/photos of receipt." },
+    hide: { description: "Flag to hide the receipt from display." },
+    cancellationNote: { description: "Reason for cancellation (if applicable)." },
+    canceledAt: { description: "Cancellation date and time." },
+    canceledBy: { description: "User who canceled the receipt." },
   },
+  vendor: {
+    id: { description: "Vendor ID." },
+    name: { description: "Vendor name." },
+    email: { description: "Vendor email address." },
+    phone: { description: "Vendor phone number." },
+    address: { description: "Vendor address." },
+    notes: { description: "Additional notes about the vendor." },
+    purchase_orders: { description: "Purchase orders from this vendor." },
+    company: { description: "Company name (required)." },
+    companyPhone: { description: "Company phone number." },
+    isCompanyShow: { description: "Flag to display company information." },
+    hide: { description: "Flag to hide the vendor from display." },
+    vendor_type: { description: "Vendor type classification." },
+  },
+  products:{
+    id: { description: "Product ID." },
+    name: { description: "Product name." },
+    price: { description: "Product price." },
+    stocks: { description: "Available stock quantity." },
+    createdAt: { description: "Date when the product was added." },
+    sellPrice: { description: "Selling price of the product." },
+    brand: { description: "Brand of the product." },
+    hide: { description: "Flag to hide the product from display." }
+  }
 };
 
 const collectionRelations: Record<string, string[]> = {

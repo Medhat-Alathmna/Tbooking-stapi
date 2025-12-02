@@ -116,9 +116,21 @@ export const executeGetSingleData = async (
 
     const uid = COLLECTION_UID_MAP[collection];
 
+    // PERMANENTLY exclude hidden records (soft delete) for collections that support it
+    // Collections with hide field: services, purchase-orders, products, vendors
+    // This filter CANNOT be overridden - hidden records are never accessible
+    const collectionsWithHide = ['services', 'purchase-orders', 'products', 'vendors'];
+    const modifiedFilters = { ...filters };
+
+    if (collectionsWithHide.includes(collection)) {
+      // Force hide filter - remove any user-provided hide filter
+      delete modifiedFilters.hide;
+      modifiedFilters.hide = { $ne: true };
+    }
+
     // Build query
     const queryArgs: any = {
-      where: filters,
+      where: modifiedFilters,
       limit: 5, // Fetch up to 5 to detect multiple matches
     };
 
