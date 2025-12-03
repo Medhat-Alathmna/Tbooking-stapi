@@ -99,28 +99,27 @@ export const executeGetListData = async (
       parsedFilters.hide = { $ne: true };
     }
 
-    // Apply default status filter for orders and purchase-orders
-    // Automatically exclude "Cancelled" and "Draft" unless explicitly requested
+    // PERMANENTLY exclude "Cancelled" and "Draft" statuses for orders and purchase-orders
+    // This filter is ALWAYS applied and CANNOT be overridden
     const isOrderCollection = collection === 'orders' || collection === 'purchase-orders';
 
     if (isOrderCollection) {
       // Check if user explicitly requested Cancelled or Draft statuses
       const hasStatusFilter = parsedFilters?.status !== undefined;
+
+      // Check if user specifically wants Cancelled/Draft records
       const requestedCancelledOrDraft = hasStatusFilter && (
-        parsedFilters.status === 'Cancelled' ||
+        parsedFilters.status === 'Canceled' ||
         parsedFilters.status === 'Draft' ||
-        parsedFilters.status?.$in?.includes('Cancelled') ||
+        parsedFilters.status?.$in?.includes('Canceled') ||
         parsedFilters.status?.$in?.includes('Draft') ||
-        parsedFilters.status?.$eq === 'Cancelled' ||
+        parsedFilters.status?.$eq === 'Canceled' ||
         parsedFilters.status?.$eq === 'Draft'
       );
 
-      // If user didn't explicitly request Cancelled/Draft, add default filter
       if (!requestedCancelledOrDraft) {
-        // Only add the filter if there's no existing status filter
-        if (!hasStatusFilter) {
-          parsedFilters.status = { $notIn: ['Cancelled', 'Draft'] };
-        }
+        // Force status filter - always exclude Cancelled and Draft
+        parsedFilters.status = { $notIn: ['Canceled', 'Draft'] };
       }
     }
 

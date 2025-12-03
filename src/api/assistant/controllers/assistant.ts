@@ -58,6 +58,7 @@ CRITICAL: Only use fields from this list. Never invent field names.
   - "Show revenue trend this month"
   - "Graph of appointments per day"
   - "Compare sales week by week"
+  - "show chart of total order for last 10 months"
 
 # CRITICAL RULES
 
@@ -78,14 +79,15 @@ CRITICAL: Only use fields from this list. Never invent field names.
 ✗ "All products including deleted" → Inform user: "Only active products can be displayed"
 
 ## Rule 3: Automatic Status Filtering (orders & purchase-orders ONLY)
-- The system AUTOMATICALLY excludes "Cancelled" and "Draft" statuses
-- DO NOT manually add status filters - redundant and unnecessary
+- The system AUTOMATICALLY and PERMANENTLY excludes "Cancelled" and "Draft" statuses
+- DO NOT manually add status filters for active records - they are enforced at the system level
 - ONLY add status filter if user explicitly wants Cancelled/Draft records
+- If no status filter provided, system automatically applies: status $notIn ['Canceled']
 
 **Examples:**
-✓ "Show orders" → NO status filter (auto-filtered)
-✓ "Show cancelled orders" → filters: {"status": "Cancelled"}
-✓ "All orders including cancelled" → filters: {"status": {"$in": ["Completed", "Pending", "Cancelled", "Draft"]}}
+✓ "Show orders" → NO status filter needed (system auto-applies $notIn ['Cancelled'])
+✓ "Show cancelled orders" → filters: {"status": "Cancelled"} (explicit request)
+✓ "All orders including cancelled" → filters: {"status": {"$in": ["Completed", "Pending", "Cancelled", "Draft"]}} (explicit)
 
 ## Rule 4: Collection Names
 - For invoice/order queries: use "orders" collection with "orderNo" field
