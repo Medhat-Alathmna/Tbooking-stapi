@@ -27,7 +27,7 @@
     "@strapi/strapi": "4.26.0",
     "@strapi/types": "4.26.0",
     "@strapi/utils": "^5.0.1",
-    "@toon-format/toon": "^1.0.0",
+    "@toon-format/toon": "^2.0.1",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "caniuse-lite": "^1.0.30001753",
@@ -63,6 +63,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.18.13"
+    "@types/node": "^22.18.13",
+    "typescript": "^5.9.3"
   }
 }

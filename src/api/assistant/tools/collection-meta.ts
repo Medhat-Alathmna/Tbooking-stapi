@@ -25,9 +25,9 @@ const collectionFieldMeanings: Record<string, CollectionFieldMeanings> = {
     status: {
       description: "Order payment status.",
       values: {
-        paid: "Fully paid.",
-        unpaid: "Partially paid.",
-        canceled: "Canceled - exclude from analytics.",
+        Paid: "Fully paid.",
+        Unpaid: "Partially paid / Pending.",
+        Canceled: "Canceled - exclude from analytics.",
       },
     },
     employee: { description: "Employee who handled the order." },

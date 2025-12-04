@@ -39,7 +39,8 @@ export interface GetListDataInput {
 export const executeGetListData = async (
   collection: AllowedCollection,
   filters?: FilterInput | string,
-  populate?: string[]
+  populate?: string[],
+  limit?: number
 ): Promise<any> => {
     try {
   // Validate collection
@@ -48,7 +49,8 @@ export const executeGetListData = async (
   }
 
     const uid = COLLECTION_UID_MAP[collection];
-
+  console.log(limit);
+  
     // Normalize filters: accept both object and string (for backward compatibility)
     let parsedFilters: Record<string, any> | undefined = undefined;
 
@@ -118,8 +120,25 @@ export const executeGetListData = async (
       );
 
       if (!requestedCancelledOrDraft) {
-        // Force status filter - always exclude Cancelled and Draft
-        parsedFilters.status = { $notIn: ['Canceled', 'Draft'] };
+        if (hasStatusFilter) {
+          // User has a status filter - combine it with auto-exclude using $and
+          const userStatusFilter = parsedFilters.status;
+
+          // Use $and to combine both conditions
+          if (!parsedFilters.$and) {
+            parsedFilters.$and = [];
+          }
+
+          parsedFilters.$and.push(
+            { status: userStatusFilter },
+            { status: { $notIn: ['Canceled', 'Draft'] } }
+          );
+
+          delete parsedFilters.status;
+        } else {
+          // No user status filter - just add auto-exclude
+          parsedFilters.status = { $notIn: ['Canceled', 'Draft'] };
+        }
       }
     }
 
@@ -131,9 +150,15 @@ export const executeGetListData = async (
       queryArgs.populate = populate;
     }
 
+    if (limit !== undefined) {
+      queryArgs.limit = limit;
+    }
+
     // Default ordering by creation date (newest first)
     queryArgs.orderBy = { createdAt: "desc" };
 
+    console.log(queryArgs);
+    
     const results = await strapi.db.query(uid).findMany(queryArgs);
 
     // Transform results based on collection type

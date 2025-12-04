@@ -2,6 +2,7 @@ import { HumanMessage, AIMessage, SystemMessage, createAgent } from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
 import { collectionFieldMeanings, filterOperators } from "../tools/collection-meta";
 import { allLangChainTools } from "../tools/langchain-tools";
+import { toonStats, fromTOON } from "../tools/toon-official-wrapper";
 module.exports = {
   async processChatWithLangChain(ctx: any) {
     const {
@@ -15,6 +16,12 @@ module.exports = {
     const today = new Date().toISOString().split("T")[0];
     const isArabic = /[\u0600-\u06FF]/.test(userMessage);
     const lang = isArabic ? "Arabic" : "English";
+
+    // Format filter operators for LLM
+    const filterOperatorsGuide = filterOperators
+      .map(({ operator, description }) => `  ${operator}: ${description}`)
+      .join("\n");
+
     const SYSTEM_PROMPT = `
 # IDENTITY
 You are StrapiOps, an enterprise ERP assistant for a salon management platform.
@@ -27,6 +34,31 @@ Available system fields per collection:
 ${JSON.stringify(collectionFieldMeanings, null, 2)}
 
 CRITICAL: Only use fields from this list. Never invent field names.
+
+# FILTER OPERATORS (REQUIRED FOR ALL FILTERS)
+When creating filters, you MUST use these Strapi operators:
+${filterOperatorsGuide}
+
+**CRITICAL FILTER RULES:**
+- NEVER send filters as plain values: ❌ {"status": "Unpaid"}
+- ALWAYS use operators: ✅ {"status": {"$eq": "Unpaid"}}
+- For equality: Use {"field": {"$eq": "value"}}
+- For date ranges: Use {"createdAt": {"$gte": "2025-01-01T00:00", "$lte": "2025-01-31T23:59"}}
+- For multiple values: Use {"status": {"$in": ["Paid", "Unpaid"]}}
+- For exclusion: Use {"status": {"$ne": "Canceled"}}
+- For text search: Use {"name": {"$containsi": "search term"}}
+
+**FILTER EXAMPLES:**
+✅ Single condition: {"status": {"$eq": "Paid"}}
+✅ Date range: {"createdAt": {"$gte": "2025-08-01T00:00", "$lte": "2025-08-31T23:59"}}
+✅ Multiple conditions: {"status": {"$eq": "Paid"}, "cash": {"$gte": 100}}
+✅ Array values: {"status": {"$in": ["Paid", "Unpaid"]}}
+✅ Text search: {"customer.firstName": {"$containsi": "john"}}
+✅ Logical OR: {"$or": [{"status": {"$eq": "Paid"}}, {"cash": {"$gt": 1000}}]}
+
+❌ WRONG: {"status": "Paid"}
+❌ WRONG: {"createdAt": "2025-08-01"}
+❌ WRONG: {"cash": 100}
 
 # FIELD NAMING RULES
 - Orders collection: Use "orderNo" (NOT invoiceNo, invoice_number, etc.)
@@ -64,7 +96,7 @@ CRITICAL: Only use fields from this list. Never invent field names.
 
 ## Rule 1: Tool Selection Priority
 1. User mentions specific ID/number/email → use get_single_data
-2. User wants chart/graph/trend → use get_list_data FIRST, then get_chart_data
+2. User wants chart/graph/trend → use get_chart_data (it fetches data internally)
 3. User wants list/table/count → use get_list_data
 
 ## Rule 2: Automatic Soft Delete Filtering
@@ -86,8 +118,8 @@ CRITICAL: Only use fields from this list. Never invent field names.
 
 **Examples:**
 ✓ "Show orders" → NO status filter needed (system auto-applies $notIn ['Cancelled'])
-✓ "Show cancelled orders" → filters: {"status": "Cancelled"} (explicit request)
-✓ "All orders including cancelled" → filters: {"status": {"$in": ["Completed", "Pending", "Cancelled", "Draft"]}} (explicit)
+✓ "Show cancelled orders" → filters: {"status": {"$eq": "Cancelled"}}
+✓ "All orders including cancelled" → filters: {"status": {"$in": ["Completed", "Pending", "Cancelled", "Draft"]}}
 
 ## Rule 4: Collection Names
 - For invoice/order queries: use "orders" collection with "orderNo" field
@@ -115,10 +147,16 @@ CRITICAL: Only use fields from this list. Never invent field names.
 
 ## get_chart_data Guidelines
 
-**Required workflow:**
-1. Call get_list_data to fetch raw data
-2. Pass the results (rows) to get_chart_data
-3. Specify ALL parameters: metric, entity, chartType, xLabel, yLabel
+**Important:** This tool fetches data internally - you don't need to call get_list_data first!
+
+**Required parameters:**
+- collection: Target collection (orders, appointments, etc.)
+- filters: Same as get_list_data (optional)
+- populate: Same as get_list_data (optional)
+- metric: Numeric field to aggregate (cash, total, quantity, price, discount, etc.)
+- chartType: Visualization type
+- xLabel: X-axis label
+- yLabel: Y-axis label
 
 **Metric parameter:**
 - Accepts ANY numeric field name (cash, total, quantity, price, discount, etc.)
@@ -131,9 +169,15 @@ CRITICAL: Only use fields from this list. Never invent field names.
 - area: cumulative data
 - pie: proportions
 
-**Example workflow:**
-Step 1: get_list_data({collection: "orders", filters: {...}})
-Step 2: get_chart_data({rows: <from step 1>, metric: "cash", entity: "orders", chartType: "line", xLabel: "Date", yLabel: "Revenue"})
+**Example:**
+get_chart_data({
+  collection: "orders",
+  filters: {"createdAt": {"$gte": "2025-08-01T00:00", "$lte": "2025-08-31T23:59"}},
+  metric: "cash",
+  chartType: "line",
+  xLabel: "Date",
+  yLabel: "Revenue"
+})
 
 # FINAL REMINDERS
 - Be precise and efficient
@@ -188,10 +232,25 @@ Step 2: get_chart_data({rows: <from step 1>, metric: "cash", entity: "orders", c
       }
 
       // Helper: Parse tool message content
-      function parseToolContent(toolMsg: any): any | null {
+      function parseToolContent(toolMsg: any, toolName: string): any | null {
         try {
           const raw = toolMsg.kwargs?.content ?? toolMsg.content;
-          return typeof raw === "string" ? JSON.parse(raw) : raw;
+
+          // If not a string, return as-is (already parsed)
+          if (typeof raw !== "string") {
+            return raw;
+          }
+
+          // get_list_data returns TOON format, decode it
+          if (toolName === "get_list_data") {
+            const decoded = fromTOON(raw);
+
+
+            return decoded;
+          }
+
+          // Other tools return JSON
+          return JSON.parse(raw);
         } catch (e) {
           console.error(`[Parse error for ${toolMsg.name}]:`, e);
           return null;
@@ -243,8 +302,8 @@ Step 2: get_chart_data({rows: <from step 1>, metric: "cash", entity: "orders", c
           return { used: true, data: null };
         }
 
-        // Parse content
-        const parsed = parseToolContent(toolMsg);
+        // Parse content (pass toolName to handle TOON format correctly)
+        const parsed = parseToolContent(toolMsg, toolName);
         if (!parsed) {
           return { used: true, data: null };
         }
@@ -296,6 +355,51 @@ Step 2: get_chart_data({rows: <from step 1>, metric: "cash", entity: "orders", c
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
         response: "I'm sorry, I encountered an error processing your request.",
+      };
+    }
+  },
+
+  /**
+   * Get TOON optimization statistics
+   */
+  async getToonStats(ctx: any) {
+    try {
+      const stats = toonStats.getStats();
+
+      ctx.body = {
+        success: true,
+        stats: {
+          ...stats,
+          message: stats.totalCalls === 0
+            ? "No TOON optimizations have been performed yet."
+            : `TOON has optimized ${stats.totalCalls} requests, saving ${stats.percentageSaved}% tokens.`
+        }
+      };
+    } catch (error) {
+      console.error("[TOON Stats] Error:", error);
+      ctx.body = {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  },
+
+  /**
+   * Reset TOON statistics
+   */
+  async resetToonStats(ctx: any) {
+    try {
+      toonStats.reset();
+
+      ctx.body = {
+        success: true,
+        message: "TOON statistics have been reset."
+      };
+    } catch (error) {
+      console.error("[TOON Stats Reset] Error:", error);
+      ctx.body = {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error"
       };
     }
   }
