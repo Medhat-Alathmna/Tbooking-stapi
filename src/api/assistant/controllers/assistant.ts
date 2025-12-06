@@ -3,6 +3,103 @@ import { ChatOpenAI } from "@langchain/openai";
 import { collectionFieldMeanings, filterOperators } from "../tools/collection-meta";
 import { allLangChainTools } from "../tools/langchain-tools";
 import { toonStats, fromTOON } from "../tools/toon-official-wrapper";
+import { securityLogger } from '../services/security-logger';
+import { filterSensitiveData, containsSystemPromptFragments } from '../utils/content-filter';
+
+/**
+ * التحقق من صحة مدخلات المستخدم
+ * Validate and sanitize user input
+ */
+function validateUserInput(input: any, ctx?: any): { valid: boolean; sanitized: string; error?: string } {
+  if (!input) {
+    return { valid: false, sanitized: '', error: 'User message is required' };
+  }
+
+  const message = String(input).trim();
+
+  if (message.length === 0) {
+    return { valid: false, sanitized: '', error: 'User message cannot be empty' };
+  }
+
+  // حد أقصى 2000 حرف - Maximum 2000 characters
+  if (message.length > 2000) {
+    return {
+      valid: false,
+      sanitized: '',
+      error: 'Message too long. Maximum 2000 characters allowed.'
+    };
+  }
+
+  // إزالة null bytes والـ control characters - Remove null bytes and control characters
+  const sanitized = message
+    .replace(/\0/g, '')
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '');
+
+  // كشف محاولات prompt injection (للـ logging فقط) - Detect prompt injection attempts (logging only)
+  const suspiciousPatterns = [
+    /ignore\s+(previous|above|all)\s+instructions/i,
+    /you\s+are\s+now/i,
+    /system\s*:/i,
+    /\[SYSTEM\]/i,
+    /forget\s+everything/i,
+  ];
+
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(sanitized)) {
+      securityLogger.log({
+        type: 'prompt_injection_attempt',
+        userId: ctx?.state?.user?.id,
+        userEmail: ctx?.state?.user?.email,
+        message: 'Potential prompt injection detected',
+        metadata: {
+          input: sanitized.substring(0, 100),
+          pattern: pattern.toString(),
+        }
+      });
+      // نسجل فقط ولا نمنع - Log only, don't block
+    }
+  }
+
+  return { valid: true, sanitized };
+}
+
+/**
+ * تنظيف والتحقق من conversation history
+ * Sanitize and validate conversation history
+ */
+function sanitizeConversationHistory(
+  history: Array<{ role: string; content: string }> = []
+): Array<{ role: string; content: string }> {
+  const MAX_HISTORY_LENGTH = 20;
+  const validHistory = history.slice(-MAX_HISTORY_LENGTH);
+
+  return validHistory
+    .filter(msg => {
+      // السماح فقط بـ user و assistant - Only allow user and assistant roles
+      if (!['user', 'assistant'].includes(msg.role)) {
+        console.warn('[Security] Invalid role rejected:', msg.role);
+        return false;
+      }
+
+      // رفض رسائل فارغة - Reject empty messages
+      if (typeof msg.content !== 'string' || msg.content.trim().length === 0) {
+        return false;
+      }
+
+      // رفض رسائل طويلة جداً (هجوم محتمل) - Reject excessively long messages (potential attack)
+      if (msg.content.length > 10000) {
+        console.warn('[Security] Excessively long message rejected');
+        return false;
+      }
+
+      return true;
+    })
+    .map(msg => ({
+      role: msg.role,
+      content: msg.content.trim().replace(/\0/g, '')
+    }));
+}
+
 module.exports = {
   async processChatWithLangChain(ctx: any) {
     const {
@@ -13,8 +110,21 @@ module.exports = {
       conversationHistory?: Array<{ role: string; content: string }>;
     };
 
+    // التحقق من المدخلات - Validate user input
+    const validation = validateUserInput(userMessage, ctx);
+    if (!validation.valid) {
+      return {
+        success: false,
+        error: validation.error,
+        response: "I couldn't process your request. Please check your input.",
+      };
+    }
+
+    const sanitizedUserMessage = validation.sanitized;
+    const sanitizedHistory = sanitizeConversationHistory(conversationHistory);
+
     const today = new Date().toISOString().split("T")[0];
-    const isArabic = /[\u0600-\u06FF]/.test(userMessage);
+    const isArabic = /[\u0600-\u06FF]/.test(sanitizedUserMessage);
     const lang = isArabic ? "Arabic" : "English";
 
     // Format filter operators for LLM
@@ -179,6 +289,11 @@ get_chart_data({
   yLabel: "Revenue"
 })
 
+
+
+
+**Key Principle:** Focus on WHAT the user asked for - that's PRIMARY. Everything else is supporting detail.
+
 # FINAL REMINDERS
 - Be precise and efficient
 - Ask clarifying questions if uncertain
@@ -199,7 +314,8 @@ get_chart_data({
 
       const messages = [new SystemMessage(SYSTEM_PROMPT)];
 
-      conversationHistory.forEach((msg) => {
+      // استخدام sanitized history - Use sanitized history
+      sanitizedHistory.forEach((msg) => {
         if (msg.role === "user") {
           messages.push(new HumanMessage(msg.content));
         } else if (msg.role === "assistant") {
@@ -207,7 +323,8 @@ get_chart_data({
         }
       });
 
-      messages.push(new HumanMessage(userMessage));
+      // استخدام sanitized user message - Use sanitized user message
+      messages.push(new HumanMessage(sanitizedUserMessage));
 
       const result = await agent.invoke({ messages });
       const lastMessage = result.messages[result.messages.length - 1];
@@ -339,18 +456,57 @@ get_chart_data({
       const singleData = extractToolResult(result, "get_single_data");
 
 
+      // استخراج المحتوى - Extract content
+      const responseContent = typeof lastMessage?.content === 'string'
+        ? lastMessage.content
+        : JSON.stringify(lastMessage);
+
+      // تصفية البيانات الحساسة - Filter sensitive data
+      const filteredResponse = filterSensitiveData(responseContent);
+
+      // التحقق من تسريب prompt - Check for prompt leakage
+      if (containsSystemPromptFragments(filteredResponse)) {
+        securityLogger.log({
+          type: 'suspicious_pattern',
+          userId: ctx.state.user?.id,
+          userEmail: ctx.state.user?.email,
+          message: 'Response contains system prompt fragments',
+        });
+
+        return {
+          success: false,
+          error: 'response_filtered',
+          response: "I apologize, but I couldn't generate an appropriate response.",
+        };
+      }
+
       return {
         success: true,
-        response: lastMessage,
+        response: filteredResponse,
         chartData: chartData ?? null,
         listData: listData ?? null,
         singleData: singleData ?? null,
-        result: result,
+        // حذف result field - Removed result field for security
         usedTool: toolsUsed.length > 0,
         toolsUsed: [...new Set(toolsUsed)],
+        metadata: {
+          timestamp: new Date().toISOString(),
+        }
       };
     } catch (error) {
       console.error("[LangChain] Error:", error);
+
+      // تسجيل الخطأ - Log error
+      securityLogger.log({
+        type: 'error',
+        userId: ctx.state.user?.id,
+        userEmail: ctx.state.user?.email,
+        message: 'LangChain processing error',
+        metadata: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }
+      });
+
       return {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
@@ -400,6 +556,42 @@ get_chart_data({
       ctx.body = {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error"
+      };
+    }
+  },
+
+  /**
+   * الحصول على إحصائيات الأمان (admin فقط)
+   * Get security statistics (admin only)
+   */
+  async getSecurityStats(ctx: any) {
+    try {
+      // التحقق من صلاحيات admin - Check admin permissions
+      const userRole = ctx.state.user?.role?.type || ctx.state.user?.role?.name;
+      const isAdmin = userRole === 'admin' || userRole === 'Admin';
+
+      if (!isAdmin) {
+        ctx.status = 403;
+        ctx.body = {
+          success: false,
+          error: 'Forbidden: Admin access required',
+        };
+        return;
+      }
+
+      const stats = securityLogger.getStats();
+      const recentEvents = securityLogger.getRecentEvents(50);
+
+      ctx.body = {
+        success: true,
+        stats,
+        recentEvents,
+      };
+    } catch (error) {
+      console.error("[Security Stats] Error:", error);
+      ctx.body = {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
